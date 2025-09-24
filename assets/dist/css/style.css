@@ -1,0 +1,497 @@
+/* Hero */
+.hero {
+  padding-top: 100px;
+  padding-bottom: 50px;
+  background-color: #fff; 
+}
+
+.hero h1 {
+  line-height: 1.2;
+}
+
+.hero p {
+  max-width: 500px;
+}
+
+.hero img {
+  width: 550px; 
+  max-width: 100%;
+}
+
+@media (max-width: 992px) {
+  .hero-box .box p {
+    font-size: 14px;
+    width: 300px;
+  }
+
+  .hero-box .box img {
+    width: 300px;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero {
+    padding-top: 50px;
+  }
+
+  .hero-box {
+    text-align: center;
+  }
+
+  .hero-box .box p {
+    width: 100%;
+  }
+}
+/* Hero */
+
+/* About */
+#about {
+  padding-top: 100px;     /* jarak dari hero ke atas */
+  padding-bottom: 100px;  /* jarak bawah biar lega */
+  background-color: #fff; /* optional, bisa diganti kalau mau beda warna */
+}
+
+.about-box img {
+  width: 400px;
+}
+
+@media (max-width: 475px) {
+  .about-box img {
+    width: 300px;
+  }
+}
+/* About */
+/* Footer */
+.footer{
+    margin-top: 100px;
+    padding-bottom: 20px;
+}
+.footer-box .row .col:nth-child(2) a{
+    opacity: 75%;
+}
+
+.footer-box .row .col:nth-child(2) a:hover{
+    opacity: 100%;
+}
+
+.copyright{
+    margin-top : 100px;
+}
+/* Footer */
+
+/* Kosakata Modal Styles */
+.category-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.category-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.vocab-item {
+  transition: background-color 0.3s ease;
+}
+
+.vocab-item:hover {
+  background-color: #f8f9fa !important;
+}
+
+/* Override untuk single flashcard mode */
+.single-flashcard-container .vocab-item:hover {
+  background-color: transparent !important;
+}
+
+.stat-item {
+  transition: background-color 0.3s ease;
+}
+
+.stat-item:hover {
+  background-color: rgba(255,255,255,0.4) !important;
+}
+
+/* Responsive Kosakata Modal */
+@media (max-width: 768px) {
+  .modal-dialog {
+    margin: 10px;
+  }
+  
+  .category-card {
+    min-height: 100px !important;
+  }
+}
+
+/* Vocabulary Card Styles */
+.vocab-word {
+  font-weight: bold;
+  font-size: 1.25rem;
+  color: #0d6efd;
+}
+
+.meaning {
+  font-weight: 600;
+}
+
+.example {
+  font-style: italic;
+  color: #6c757d;
+}
+
+/* Flashcard Styles */
+.flashcard-container {
+  perspective: 1000px;
+  height: 200px;
+  cursor: pointer;
+}
+
+.flashcard {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  transition: transform 0.6s;
+  transform-style: preserve-3d;
+}
+
+.flashcard.flipped {
+  transform: rotateY(180deg);
+}
+
+.flashcard-front,
+.flashcard-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  transition: box-shadow 0.3s ease;
+}
+
+.flashcard-front {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.flashcard-back {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  color: white;
+  transform: rotateY(180deg);
+}
+
+.flashcard-container:hover .flashcard-front,
+.flashcard-container:hover .flashcard-back {
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+}
+
+.flashcard-content {
+  padding: 20px;
+  width: 100%;
+}
+
+.flashcard-content h4 {
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+.example-text {
+  font-size: 0.9rem;
+  margin-bottom: 10px;
+  font-style: italic;
+}
+
+/* Single Flashcard Mode */
+.single-flashcard-container {
+  perspective: 1000px;
+  height: 300px;
+  cursor: pointer;
+  margin: 0 auto;
+}
+
+.single-flashcard-container .flashcard {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  transition: transform 0.8s;
+  transform-style: preserve-3d;
+}
+
+.single-flashcard-container .flashcard.flipped {
+  transform: rotateY(180deg);
+}
+
+.single-flashcard-container .flashcard-front,
+.single-flashcard-container .flashcard-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+  transition: box-shadow 0.3s ease;
+}
+
+.single-flashcard-container .flashcard-front {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  color: white !important;
+}
+
+.single-flashcard-container .flashcard-back {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%) !important;
+  color: white !important;
+  transform: rotateY(180deg);
+}
+
+.single-flashcard-container:hover .flashcard-front,
+.single-flashcard-container:hover .flashcard-back {
+  box-shadow: 0 12px 35px rgba(0,0,0,0.25);
+}
+
+.single-flashcard-container .flashcard-content h2 {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+/* Audio Button Flashcard */
+.audio-btn-flashcard {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  z-index: 10;
+}
+
+.audio-btn-flashcard:hover {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: scale(1.1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.audio-btn-flashcard:active {
+  transform: scale(0.95);
+}
+
+.flashcard-mode {
+  animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive Flashcard */
+@media (max-width: 768px) {
+  .flashcard-container {
+    height: 150px;
+  }
+  
+  .flashcard-content {
+    padding: 15px;
+  }
+  
+  .flashcard-content h4 {
+    font-size: 1.1rem;
+  }
+  
+  .example-text {
+    font-size: 0.8rem;
+  }
+  
+  .single-flashcard-container {
+    height: 250px;
+  }
+  
+  .single-flashcard-container .flashcard-content h2 {
+    font-size: 2rem;
+  }
+  
+  .audio-btn-flashcard {
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+    top: 10px;
+    right: 10px;
+  }
+}
+
+/* Pink Salmon Button */
+.btn-pink-salmon {
+  background-color: #FA8072 !important;
+  border-color: #FA8072 !important;
+  color: white !important;
+}
+
+.btn-pink-salmon:hover {
+  background-color: #E9967A !important;
+  border-color: #E9967A !important;
+  color: white !important;
+}
+
+.btn-pink-salmon:focus, .btn-pink-salmon.focus {
+  background-color: #E9967A !important;
+  border-color: #E9967A !important;
+  color: white !important;
+  box-shadow: 0 0 0 0.2rem rgba(250, 128, 114, 0.5) !important;
+}
+
+.btn-pink-salmon:active, .btn-pink-salmon.active {
+  background-color: #CD853F !important;
+  border-color: #CD853F !important;
+  color: white !important;
+}
+
+/* Quiz Modal Styling */
+#quizModal .modal-header {
+  background: linear-gradient(135deg, #FA8072 0%, #FFB6C1 100%) !important;
+  color: white !important;
+}
+
+#quizModal .modal-title {
+  font-weight: bold !important;
+}
+
+#quizModal .quiz-option {
+  background: linear-gradient(135deg, #FFE4E1 0%, #FFF0F5 100%) !important;
+  border: 2px solid #FA8072 !important;
+  color: #8B4513 !important;
+  font-weight: 500 !important;
+  transition: all 0.3s ease !important;
+}
+
+#quizModal .quiz-option:hover {
+  background: linear-gradient(135deg, #FA8072 0%, #FFB6C1 100%) !important;
+  color: white !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 12px rgba(250, 128, 114, 0.3) !important;
+}
+
+#quizModal .quiz-option.btn-success {
+  background: linear-gradient(135deg, #32CD32 0%, #98FB98 100%) !important;
+  border-color: #32CD32 !important;
+  color: white !important;
+  animation: correctAnswer 0.6s ease !important;
+}
+
+#quizModal .quiz-option.btn-danger {
+  background: linear-gradient(135deg, #DC143C 0%, #FFB6C1 100%) !important;
+  border-color: #DC143C !important;
+  color: white !important;
+  animation: wrongAnswer 0.6s ease !important;
+}
+
+#quizModal .quiz-option.btn-outline-secondary {
+  background: linear-gradient(135deg, #D3D3D3 0%, #F5F5F5 100%) !important;
+  border-color: #A9A9A9 !important;
+  color: #696969 !important;
+}
+
+#quizModal #quiz-result {
+  background: linear-gradient(135deg, #FFF8DC 0%, #FFFACD 100%) !important;
+  padding: 15px !important;
+  border-radius: 10px !important;
+  border: 2px solid #FA8072 !important;
+}
+
+#quizModal #next-quiz-btn {
+  background: linear-gradient(135deg, #32CD32 0%, #98FB98 100%) !important;
+  border: none !important;
+  color: white !important;
+  font-weight: bold !important;
+  transition: all 0.3s ease !important;
+}
+
+#quizModal #next-quiz-btn:hover {
+  background: linear-gradient(135deg, #228B22 0%, #90EE90 100%) !important;
+  transform: translateY(-2px) !important;
+}
+
+#quizModal #restart-quiz-btn {
+  background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%) !important;
+  border: none !important;
+  color: white !important;
+  font-weight: bold !important;
+  transition: all 0.3s ease !important;
+}
+
+#quizModal #restart-quiz-btn:hover {
+  background: linear-gradient(135deg, #DAA520 0%, #FF8C00 100%) !important;
+  transform: translateY(-2px) !important;
+}
+
+/* Quiz Animations */
+@keyframes correctAnswer {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+@keyframes wrongAnswer {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+  100% { transform: translateX(0); }
+}
+
+/* Card Alignment Fix */
+.row.justify-content-center {
+  display: flex !important;
+  align-items: stretch !important;
+}
+
+.row.justify-content-center .col {
+  display: flex !important;
+  flex-direction: column !important;
+  margin-bottom: 0 !important;
+}
+
+.row.justify-content-center .col .shadow {
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100% !important;
+  flex: 1 !important;
+}
+
+/* Equal height cards with consistent spacing */
+.features-row {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 2rem !important;
+  justify-content: center !important;
+}
+
+.features-row > .col {
+  flex: 1 1 400px !important;
+  max-width: 500px !important;
+  min-height: 100% !important;
+}
+
+/* Smooth Scroll */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Offset untuk navbar fixed */
+#vocabulary, #quiz, #about {
+  scroll-margin-top: 80px;
+}
