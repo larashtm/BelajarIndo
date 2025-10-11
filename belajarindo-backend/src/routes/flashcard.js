@@ -1,9 +1,8 @@
 const express = require('express');
-const { PrismaClient } = require('@prisma/client');
 const authMiddleware = require('../middleware/auth');
+const prisma = require('../utils/prisma');
 
 const router = express.Router();
-const prisma = new PrismaClient();
 
 // For this app we store vocab progress in VocabProgress model
 router.post('/progress', authMiddleware, async (req, res) => {

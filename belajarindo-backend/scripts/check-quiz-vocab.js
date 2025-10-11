@@ -1,7 +1,6 @@
-const { PrismaClient } = require('@prisma/client');
+const prisma = require('../src/utils/prisma');
 
 (async () => {
-  const prisma = new PrismaClient();
   try {
     const quizResults = await prisma.quizResult.findMany({ where: { userId: 1 }, orderBy: { completedAt: 'desc' }, take: 10 });
     const vocabProgress = await prisma.vocabProgress.findMany({ where: { userId: 1 } });
@@ -11,7 +10,5 @@ const { PrismaClient } = require('@prisma/client');
   } catch (e) {
     console.error('DB_CHECK_ERROR:', e);
     process.exitCode = 1;
-  } finally {
-    await prisma.$disconnect();
   }
 })();

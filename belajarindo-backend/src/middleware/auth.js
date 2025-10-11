@@ -16,6 +16,14 @@ module.exports = function authMiddleware(req, res, next) {
   const tokenFromHeader = typeof authHeader === 'string' && authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : null;
   const token = tokenFromCookie || tokenFromHeader;
   if (!token) {
+    // Diagnostic logging: do not log token contents, only presence
+    try {
+      const origin = req.headers && req.headers.origin;
+      const cookieNames = req.headers && req.headers.cookie ? req.headers.cookie.split(';').map(s=>s.split('=')[0].trim()) : [];
+      console.warn('AUTH: missing token for request', { method: req.method, path: req.originalUrl || req.url, origin, cookieNames, hasAuthHeader: !!authHeader });
+    } catch (e) {
+      console.warn('AUTH: missing token and failed to compute diag info', e);
+    }
     return res.status(401).json({ error: 'Unauthorized - No token provided' });
   }
 

@@ -1,4 +1,2 @@
-import { PrismaClient } from '@prisma/client';
-
-export const prisma = global.__prisma || new PrismaClient();
-if (!global.__prisma) global.__prisma = prisma;
+// Re-export the singleton Prisma client from src/utils/prisma.js
+module.exports = require('../../src/utils/prisma');

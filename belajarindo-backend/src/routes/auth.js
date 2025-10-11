@@ -1,10 +1,9 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
-const { PrismaClient } = require('@prisma/client');
 const { generateToken, verifyToken } = require('../utils/jwt');
+const prisma = require('../utils/prisma');
 
 const router = express.Router();
-const prisma = new PrismaClient();
 
 // Register
 router.post('/register', async (req, res) => {
@@ -20,9 +19,11 @@ router.post('/register', async (req, res) => {
   const user = await prisma.user.create({ data: { name, email, password: hashedPassword, salt } });
 
   const token = generateToken(user.id);
+    // set cookie for environments that support it
     res.cookie('token', token, { httpOnly: true, secure: process.env.NODE_ENV === 'production', maxAge: 7 * 24 * 60 * 60 * 1000 });
 
-    res.json({ success: true, user: { id: user.id, name: user.name, email: user.email } });
+    // Also return token in JSON so frontend can use Authorization header (helpful for cross-port dev)
+    res.json({ success: true, user: { id: user.id, name: user.name, email: user.email }, token });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Server error' });
@@ -39,10 +40,11 @@ router.post('/login', async (req, res) => {
     const validPassword = await bcrypt.compare(password, user.password);
     if (!validPassword) return res.status(400).json({ error: 'Email atau password salah' });
 
-    const token = generateToken(user.id);
-    res.cookie('token', token, { httpOnly: true, secure: process.env.NODE_ENV === 'production', maxAge: 7 * 24 * 60 * 60 * 1000 });
+  const token = generateToken(user.id);
+  res.cookie('token', token, { httpOnly: true, secure: process.env.NODE_ENV === 'production', maxAge: 7 * 24 * 60 * 60 * 1000 });
 
-    res.json({ success: true, user: { id: user.id, name: user.name, email: user.email } });
+  // Return token in response to support Authorization header for frontend
+  res.json({ success: true, user: { id: user.id, name: user.name, email: user.email }, token });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Server error' });

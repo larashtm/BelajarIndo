@@ -1,37 +1,75 @@
 const express = require('express');
-const { PrismaClient } = require('@prisma/client');
+const prisma = require('../utils/prisma');
 const path = require('path');
 const authMiddleware = require(path.join(__dirname, '..', 'middleware', 'auth'));
 
 const router = express.Router();
-const prisma = new PrismaClient();
 
 router.post('/submit', authMiddleware, async (req, res) => {
   try {
     // Accept flexible payloads from frontend. Compute required numeric fields if missing.
-    const { quizType, score = 0, totalQuestions: tq, correctAnswers: ca, questions = [], timeSpent: ts } = req.body;
-    const userId = req.userId;
+    // Log incoming body for diagnostics
+    const body = req.body || {};
+    try { console.log('QUIZ SUBMIT REQUEST BODY:', JSON.stringify(body)); } catch(e){ console.log('QUIZ SUBMIT REQUEST BODY: (could not stringify)'); }
+    const { quizType, score, totalQuestions: tq, correctAnswers: ca, questions = [], timeSpent: ts } = body;
+    const userId = req.userId || (req.user && req.user.userId) || body.userId;
 
-    // derive totals when possible
-    const totalQuestions = Number.isInteger(tq) ? tq : (Array.isArray(questions) ? questions.length : 0);
-    const correctAnswers = Number.isInteger(ca) ? ca : 0;
-    const timeSpent = Number.isInteger(ts) ? ts : 0;
+    // user must be present (we require auth middleware normally)
+    if (!userId) return res.status(401).json({ error: 'Unauthorized: missing user' });
+
+    // derive totals when possible and normalize numeric inputs
+    const parsedTq = Number(tq);
+    let totalQuestions = Number.isFinite(parsedTq) && parsedTq >= 0 ? Math.max(0, Math.floor(parsedTq)) : (Array.isArray(questions) ? questions.length : 0);
+
+    const parsedCa = Number(ca);
+    let correctAnswers = Number.isFinite(parsedCa) && parsedCa >= 0 ? Math.max(0, Math.floor(parsedCa)) : 0;
+
+    // Normalize score (float) and timeSpent (seconds)
+    const parsedScore = Number(score);
+    let normalizedScore = Number.isFinite(parsedScore) ? parsedScore : NaN;
+
+    const parsedTs = Number(ts);
+    const timeSpent = Number.isFinite(parsedTs) && parsedTs > 0 ? Math.max(0, Math.floor(parsedTs)) : 0;
+
+    // If totalQuestions is still zero try to derive from questions array
+    if (totalQuestions === 0 && Array.isArray(questions) && questions.length > 0) {
+      totalQuestions = questions.length;
+    }
+
+    // If still nothing, reject the payload as invalid
+    if (totalQuestions === 0) {
+      return res.status(400).json({ error: 'Invalid quiz payload: totalQuestions or questions required', received: body });
+    }
+
+    // Ensure sane bounds: score non-negative, correctAnswers not greater than totalQuestions
+    correctAnswers = Math.min(correctAnswers, totalQuestions);
+    if (!Number.isFinite(normalizedScore) || normalizedScore < 0) {
+      // fallback: compute score from correctAnswers if available
+      normalizedScore = totalQuestions > 0 ? Math.round((correctAnswers / totalQuestions) * 100) : 0;
+    }
+
+    // clamp score to 0-100
+    if (normalizedScore < 0) normalizedScore = 0;
+    if (normalizedScore > 100) normalizedScore = 100;
 
     const quizCategory = typeof quizType === 'string' && quizType.length > 0 ? quizType : 'unknown';
 
     const payload = {
-      userId,
+      userId: Number(userId),
       quizCategory,
-      score: Number(score) || 0,
-      totalQuestions: Number(totalQuestions) || 0,
-      correctAnswers: Number(correctAnswers) || 0,
-      timeSpent: Number(timeSpent) || 0,
+      score: normalizedScore,
+      totalQuestions: Number(totalQuestions),
+      correctAnswers: Number(correctAnswers),
+      timeSpent: Number(timeSpent),
     };
+
+  // Ensure payload logged (use console.log so it appears in server logs)
+  try { console.log('QUIZ SUBMIT PAYLOAD COMPUTED:', JSON.stringify(payload)); } catch(e){ console.log('QUIZ SUBMIT PAYLOAD COMPUTED: (could not stringify)'); }
 
     const result = await prisma.quizResult.create({ data: payload });
     res.json({ success: true, result });
   } catch (error) {
-    console.error('QUIZ SUBMIT ERROR:', error);
+    console.error('QUIZ SUBMIT ERROR:', error, '\nrequest body:', req && req.body);
     const resp = { error: 'Failed to save quiz result' };
     if (process.env.NODE_ENV !== 'production') {
       resp.detail = error && error.message ? error.message : String(error);
