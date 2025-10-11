@@ -1,0 +1,27 @@
+# Node modules
+node_modules/
+
+# Logs
+logs/
+*.log
+
+# Environment
+.env
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE/editor
+.vscode/
+.idea/
+
+# Build output
+dist/
+build/
+
+# Mac
+._*
+
+# npm
+package-lock.json
