@@ -27,6 +27,7 @@ model QuizProgress {
   userId          Int
   quizCategory    String   // 'basic', 'intermediate', 'advanced'
   progress        Int      @default(0) // 0-100
+  state           Json?    // arbitrary JSON snapshot of quiz (answers, etc.)
   currentQuestion Int      @default(0)
   lastAccessed    DateTime @default(now())
   

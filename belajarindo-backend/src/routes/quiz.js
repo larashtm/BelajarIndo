@@ -58,13 +58,20 @@ router.post('/submit', authMiddleware, async (req, res) => {
       userId: Number(userId),
       quizCategory,
       score: normalizedScore,
-      totalQuestions: Number(totalQuestions),
-      correctAnswers: Number(correctAnswers),
-      timeSpent: Number(timeSpent),
+      totalQuestions: Number.isFinite(Number(totalQuestions)) ? Math.max(0, Math.floor(Number(totalQuestions))) : 0,
+      correctAnswers: Number.isFinite(Number(correctAnswers)) ? Math.max(0, Math.floor(Number(correctAnswers))) : 0,
+      timeSpent: Number.isFinite(Number(timeSpent)) ? Math.max(0, Math.floor(Number(timeSpent))) : 0,
     };
 
   // Ensure payload logged (use console.log so it appears in server logs)
   try { console.log('QUIZ SUBMIT PAYLOAD COMPUTED:', JSON.stringify(payload)); } catch(e){ console.log('QUIZ SUBMIT PAYLOAD COMPUTED: (could not stringify)'); }
+
+    // Defensive: ensure we send valid integer fields to Prisma. Prisma will reject NaN/undefined.
+    if (!Number.isFinite(payload.totalQuestions) || payload.totalQuestions <= 0) {
+      // If we somehow still don't have totalQuestions, set to at least 1 to avoid Prisma errors.
+      payload.totalQuestions = 1;
+    }
+    payload.correctAnswers = Math.min(payload.correctAnswers || 0, payload.totalQuestions);
 
     const result = await prisma.quizResult.create({ data: payload });
     res.json({ success: true, result });
@@ -102,4 +109,48 @@ router.get('/stats', authMiddleware, async (req, res) => {
   }
 });
 
+// Quiz progress endpoints: store/load per-user progress for a quiz category
+router.get('/progress', authMiddleware, async (req, res) => {
+  try {
+    const userId = req.userId;
+    const category = typeof req.query.category === 'string' && req.query.category.length > 0 ? req.query.category : undefined;
+    const where = category ? { userId, quizCategory: category } : { userId };
+    const items = await prisma.quizProgress.findMany({ where, orderBy: { lastAccessed: 'desc' } });
+    res.json({ progress: items });
+  } catch (error) {
+    console.error('Failed to fetch quiz progress', error);
+    res.status(500).json({ error: 'Failed to fetch quiz progress' });
+  }
+});
+
+router.post('/progress', authMiddleware, async (req, res) => {
+  try {
+    const userId = req.userId;
+    const body = req.body || {};
+    const quizCategory = typeof body.quizCategory === 'string' && body.quizCategory.length > 0 ? body.quizCategory : 'unknown';
+    const progress = Number.isFinite(Number(body.progress)) ? Math.max(0, Math.min(100, Math.floor(Number(body.progress)))) : 0;
+    const currentQuestion = Number.isFinite(Number(body.currentQuestion)) ? Math.max(0, Math.floor(Number(body.currentQuestion))) : 0;
+    const state = (body.state && typeof body.state === 'object') ? body.state : undefined;
+
+    // Try to find existing record
+    const existing = await prisma.quizProgress.findFirst({ where: { userId, quizCategory } });
+    let result;
+    if (existing) {
+      const data = { progress, currentQuestion, lastAccessed: new Date() };
+      if (state !== undefined) data.state = state;
+      result = await prisma.quizProgress.update({ where: { id: existing.id }, data });
+    } else {
+      const data = { userId, quizCategory, progress, currentQuestion };
+      if (state !== undefined) data.state = state;
+      result = await prisma.quizProgress.create({ data });
+    }
+
+    res.json({ success: true, progress: result });
+  } catch (error) {
+    console.error('Failed to save quiz progress', error);
+    res.status(500).json({ error: 'Failed to save quiz progress' });
+  }
+});
+
 module.exports = router;
+
