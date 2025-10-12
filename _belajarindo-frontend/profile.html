@@ -1,0 +1,395 @@
+﻿<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Profile ΓÇö BelajarIndo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+      :root{--accent1:#667eea;--accent2:#764ba2;--muted:#6c7a89}
+      body{font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;color:#1f2937;background:linear-gradient(180deg,#f4f6fb 0%, #fff 100%);}
+      .hero-visual{background:linear-gradient(135deg,var(--accent1) 0%,var(--accent2) 100%);color:white;border-radius:14px;padding:28px;box-shadow:0 12px 30px rgba(103,110,235,0.12);}
+  /* profile picture styling */
+    .profile-pic{width:160px;height:160px;border-radius:50%;border:6px solid rgba(255,255,255,0.15);object-fit:cover;box-shadow:0 10px 30px rgba(0,0,0,0.12)}
+    .profile-container{position:relative;display:inline-block;text-align:center}
+      .stat-card{background:rgba(255,255,255,0.08);padding:14px;border-radius:10px;min-width:110px;text-align:center}
+      .stat-value{font-size:20px;font-weight:700}
+      .muted{color:var(--muted)}
+      /* Ensure profile email/id are readable on colored hero background */
+      #profileEmail, #profileId {
+        color: #ffffff !important;
+        background: transparent !important;
+        padding: 2px 6px;
+        border-radius: 4px;
+        display: inline-block;
+      }
+  @media(max-width:768px){.profile-pic{width:110px;height:110px;border-width:4px}.stat-card{min-width:90px}}
+      .card-ghost{background:linear-gradient(180deg,#ffffff,#fbfbff);border-radius:12px;box-shadow:0 8px 20px rgba(40,60,80,0.06)}
+      .chart-container{position:relative;height:280px}
+    </style>
+  </head>
+  <body id="mainBody" class="p-4">
+    <style>
+      /* simple full-page loader */
+      #authLoader{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,255,255,0.7));z-index:1200}
+      .spinner{width:64px;height:64px;border-radius:50%;border:6px solid rgba(0,0,0,0.08);border-top-color:var(--accent1);animation:spin 1s linear infinite}
+      @keyframes spin{to{transform:rotate(360deg)}}
+      #loginPrompt{display:none;max-width:420px;margin:32px auto;padding:18px;border-radius:10px;background:#fff;border:1px solid #eef3ff;text-align:center;box-shadow:0 6px 20px rgba(30,40,80,0.06)}
+    </style>
+
+    <div id="authLoader"><div style="text-align:center"><div class="spinner"></div><div class="muted mt-2">Checking session...</div></div></div>
+
+      <div id="loginPrompt" style="display:none">
+      <h5>Please sign in to view your profile</h5>
+      <p class="muted">You must be logged in to see your quiz history and profile details.</p>
+      <div class="d-flex justify-content-center gap-2">
+        <a href="index.html" class="btn btn-outline-secondary">Back to Home</a>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="d-flex align-items-center gap-4 mb-4 hero-visual">
+        <div class="profile-container">
+          <img id="profilePic" src="./assets/images/profile.jpg" alt="profile" class="profile-pic"
+               onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name=User&background=667eea&color=fff';">
+        </div>
+
+        <div class="flex-grow-1">
+          <h2 id="profileName" class="mb-1">Loading...</h2>
+          <div id="profileEmail" class="muted mb-2">&nbsp;</div>
+          <div id="profileId" class="muted small">&nbsp;</div>
+        </div>
+
+        <div class="d-flex flex-column align-items-end">
+          <div class="d-flex gap-2 mb-2" id="summaryStats"></div>
+          <div>
+            <button id="refreshBtn" class="btn btn-outline-light btn-sm me-2">Refresh</button>
+            <a href="index.html" class="btn btn-light btn-sm text-dark me-2">Home</a>
+            <button id="logoutBtnHeader" class="btn btn-danger btn-sm">Logout</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="row g-3">
+        <div class="col-lg-8">
+          <div class="card-ghost p-3 mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h5 class="mb-0">Your Performance Trend</h5>
+              <div class="muted small">Recent quiz scores</div>
+            </div>
+            <canvas id="scoreChart" height="240"></canvas>
+          </div>
+
+          <div class="card-ghost p-3">
+            <h5 class="mb-3">All Quizzes</h5>
+            <div id="historyList">Loading...</div>
+          </div>
+        </div>
+
+        <div class="col-lg-4">
+          <div class="card-ghost p-3 mb-3">
+            <h6 class="mb-3">Summary Statistics</h6>
+            <div class="d-flex flex-wrap gap-2" id="summaryCards"></div>
+          </div>
+
+          <div class="card-ghost p-3 mb-3">
+            <h6 class="mb-3">Performance Insights</h6>
+            <div id="insights" class="small"></div>
+          </div>
+
+          <div class="card-ghost p-3 mb-3">
+            <h6 class="mb-3">Quick Actions</h6>
+              <div class="d-grid gap-2">
+              <a href="profil.html" class="btn btn-outline-primary">Refresh Profile</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <script>
+      // Ensure a global API_URL is available without redeclaring it.
+      if (typeof window.API_URL === 'undefined') {
+        window.API_URL = (function(){ try{ const loc=new URL(location.href); return `${loc.protocol}//${loc.hostname}:3000`; }catch(e){ return 'http://localhost:3000'; } })();
+      }
+
+      // Profile page does not perform any server-side session checks.
+      // We now rely on the backend DB for profile and history.
+      // Immediately attempt to load session and data from server (requires token).
+      (function(){
+        document.getElementById('authLoader').style.display = 'none';
+        loadProfile();
+        loadHistory();
+      })();
+      let chart = null;
+      let allQuizData = [];
+
+      function fmt(d){ try{return new Date(d).toLocaleString()}catch{return d} }
+      function fmtShort(d){ try{return new Date(d).toLocaleDateString()}catch{return d} }
+
+      async function loadProfile(){
+        try{
+          const token = localStorage.getItem('token');
+          if(!token) {
+            // show login prompt if no token
+            document.getElementById('loginPrompt').style.display = '';
+            document.getElementById('profileName').textContent = 'Not signed in';
+            return;
+          }
+          const headers = { 'Authorization': 'Bearer ' + token };
+          const r = await fetch(window.API_URL + `/api/auth/me`, { credentials: 'include', headers });
+          if (!r.ok) {
+            document.getElementById('loginPrompt').style.display = '';
+            document.getElementById('profileName').textContent = 'Not signed in';
+            return;
+          }
+          const json = await r.json();
+          const cu = json.user || json;
+          document.getElementById('profileName').textContent = cu.name || cu.email || 'User';
+          document.getElementById('profileEmail').textContent = cu.email || '';
+          document.getElementById('profileId').textContent = 'User ID: ' + (cu.id || cu.userId || 'N/A');
+        }catch(e){ 
+          console.error('profile load',e); 
+          document.getElementById('profileName').textContent='Error loading'; 
+        }
+      }
+
+      async function loadHistory(){
+        const listEl = document.getElementById('historyList');
+        try{
+          // Always fetch history from backend DB (requires token)
+          const token = localStorage.getItem('token');
+          if (!token) {
+            listEl.innerHTML = '<div class="muted">Please login to view quiz history.</div>';
+            return;
+          }
+          const headers = { 'Authorization': 'Bearer ' + token };
+          const res = await fetch(window.API_URL + `/api/quiz/history`, { method: 'GET', headers, credentials: 'include' });
+          if (!res.ok) {
+            if (res.status === 401) {
+              listEl.innerHTML = '<div class="muted">Unauthorized. Please login to view history.</div>';
+              return;
+            }
+            throw new Error('Failed to fetch history: ' + res.status);
+          }
+          const json = await res.json();
+          const items = Array.isArray(json.results) ? json.results : [];
+          allQuizData = items;
+          
+          const scores = items.map(it=>({
+            score: Number(it.score||0), 
+            at: it.completedAt,
+            category: it.quizCategory || 'Unknown',
+            correct: it.correctAnswers || 0,
+            total: it.totalQuestions || 0
+          }));
+          
+          const total = scores.length;
+          const avg = total? Math.round(scores.reduce((s,x)=>s+x.score,0)/total*10)/10:0;
+          const best = total? Math.max(...scores.map(s=>s.score)):0;
+          const worst = total? Math.min(...scores.map(s=>s.score)):0;
+          
+          renderSummary([
+            {label:'Quizzes',value:total},
+            {label:'Average',value:avg+'%'},
+            {label:'Best',value:best+'%'},
+            {label:'Worst',value:worst+'%'}
+          ]);
+          
+          renderChart(scores.slice(0,50).reverse());
+          renderInsights(scores);
+          
+          if(items.length===0){ 
+            listEl.innerHTML='<div class="muted">No quiz history yet.</div>'; 
+            return 
+          }
+          
+          let html='';
+          items.slice(0,50).forEach((it, idx)=>{
+            const id = 'prof-' + idx + '-' + (it.id || Math.floor(Math.random()*10000));
+            const scoreColor = it.score >= 80 ? 'text-success' : it.score >= 60 ? 'text-warning' : 'text-danger';
+            html += `<div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
+              <div>
+                <strong>${it.quizCategory}</strong>
+                <div class="muted small">${fmt(it.completedAt)}</div>
+              </div>
+              <div class="text-end">
+                <div class="fw-bold ${scoreColor}">${it.score}%</div>
+                <div class="muted small">${it.correctAnswers||'-'} / ${it.totalQuestions||'-'}</div>
+              </div>
+            </div>`;
+            html += `<div class="mb-3"><button class="btn btn-sm btn-link" onclick="toggleDetails('${id}')">Show Details</button></div>`;
+            html += `<pre id="${id}" style="display:none;white-space:pre-wrap;background:#f8f9fa;border-radius:6px;padding:8px;margin-top:8px;margin-bottom:16px;">${JSON.stringify(it,null,2)}</pre>`;
+          });
+          listEl.innerHTML = html;
+        }catch(e){ 
+          console.error('history',e); 
+          listEl.innerHTML='<div class="text-danger">Failed to load history.</div>'; 
+          renderChart([]); 
+          renderSummary([]);
+          renderInsights([]);
+        }
+      }
+
+      window.toggleDetails = function(id){
+        const el = document.getElementById(id);
+        if(el) el.style.display = el.style.display === 'none' ? 'block' : 'none';
+      };
+
+      window.addEventListener('quiz:submitted', (ev) => {
+        // When a quiz is submitted elsewhere, re-fetch history from the server so the profile shows DB-backed data
+        try { loadHistory(); } catch(e){ console.warn('failed to reload history after quiz submission', e); }
+      });
+
+      function renderSummary(items){
+        const c = document.getElementById('summaryCards'); 
+        c.innerHTML='';
+        if(!items||items.length===0){ 
+          c.innerHTML='<div class="muted">No stats</div>'; 
+          return 
+        }
+        items.forEach(it=>{
+          const el = document.createElement('div'); 
+          el.className='stat-card'; 
+          el.innerHTML=`<div class="muted small">${it.label}</div><div class="stat-value">${it.value}</div>`; 
+          c.appendChild(el);
+        })
+      }
+
+      // Render the score chart (uses Chart.js). Handles empty data by showing a placeholder.
+      function renderChart(scores){
+        try{
+          const ctx = document.getElementById('scoreChart');
+          if(!ctx) return;
+          // Destroy existing chart if present
+          if(window._scoreChartInstance){ try{ window._scoreChartInstance.destroy(); }catch(e){} }
+
+          if(!scores || scores.length === 0){
+            // render a subtle empty state
+            ctx.getContext('2d').clearRect(0,0,ctx.width, ctx.height);
+            ctx.parentElement.style.minHeight = '140px';
+            ctx.parentElement.innerHTML = '<div class="muted">No scores to display yet.</div>';
+            return;
+          }
+
+          // ensure container is clean
+          ctx.parentElement.innerHTML = '';
+          const canvas = document.createElement('canvas');
+          canvas.id = 'scoreChart';
+          canvas.height = 240;
+          ctx.parentElement.appendChild(canvas);
+
+          const labels = scores.map((s,i)=> s.at ? new Date(s.at).toLocaleDateString() : `#${i+1}`);
+          const data = scores.map(s=> Number(s.score||0));
+
+          const chartCtx = canvas.getContext('2d');
+          window._scoreChartInstance = new Chart(chartCtx, {
+            type: 'line',
+            data: {
+              labels,
+              datasets: [{
+                label: 'Score',
+                data,
+                fill: true,
+                backgroundColor: 'rgba(102,126,234,0.12)',
+                borderColor: 'rgba(102,126,234,1)',
+                tension: 0.3,
+                pointRadius: 3
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              scales: {
+                y: { beginAtZero: true, max: 100 }
+              },
+              plugins: { legend: { display: false } }
+            }
+          });
+        }catch(err){ console.warn('renderChart failed', err); }
+      }
+
+      function renderInsights(scores){
+        const el = document.getElementById('insights');
+        if(!scores || scores.length === 0){
+          el.innerHTML = '<div class="muted">Complete quizzes to see insights</div>';
+          return;
+        }
+        
+        const recent = scores.slice(-5);
+        const recentAvg = recent.reduce((s,x)=>s+x.score,0)/recent.length;
+        const overallAvg = scores.reduce((s,x)=>s+x.score,0)/scores.length;
+        const trend = recentAvg > overallAvg ? '≡ƒôê Improving' : recentAvg < overallAvg ? '≡ƒôë Declining' : 'Γ₧í∩╕Å Stable';
+        
+        const categoryStats = {};
+        scores.forEach(s => {
+          if(!categoryStats[s.category]) categoryStats[s.category] = [];
+          categoryStats[s.category].push(s.score);
+        });
+        
+        let bestCategory = '';
+        let bestAvg = 0;
+        Object.keys(categoryStats).forEach(cat => {
+          const avg = categoryStats[cat].reduce((a,b)=>a+b,0)/categoryStats[cat].length;
+          if(avg > bestAvg){
+            bestAvg = avg;
+            bestCategory = cat;
+          }
+        });
+        
+        el.innerHTML = `
+          <div class="mb-2"><strong>Trend:</strong> ${trend}</div>
+          <div class="mb-2"><strong>Recent Avg:</strong> ${Math.round(recentAvg)}%</div>
+          ${bestCategory ? `<div class="mb-2"><strong>Best Category:</strong> ${bestCategory} (${Math.round(bestAvg)}%)</div>` : ''}
+          <div class="muted">Keep practicing to improve!</div>
+        `;
+      }
+
+  // Clean profile script: selection UI removed.
+      document.getElementById('refreshBtn').addEventListener('click', async()=>{ 
+        // force server verification on explicit refresh
+        await loadProfile({force:true}); 
+        await loadHistory(); 
+      });
+      document.getElementById('logoutBtnHeader').addEventListener('click', async()=>{ 
+        try{ localStorage.removeItem('user'); localStorage.removeItem('token'); }catch(e){}
+        window.location.href='login.html'; 
+      });
+
+  // do not auto-run loadProfile/loadHistory here; they are invoked after auth check above
+
+    // Ensure avatar image is used instead of initials placeholder
+    (function ensureAvatar(){
+      const img = document.getElementById('profilePic');
+      if(!img) return;
+      const desired = 'assets/images/profil.jpg';
+      // try to fetch the image HEAD first to avoid broken image display
+      fetch(desired, { method: 'HEAD' }).then(r => {
+        if (r.ok) {
+          img.src = desired;
+          img.style.display = '';
+          // hide any sibling element that might show initials like 'US'
+          try {
+            const siblings = Array.from(img.parentNode.querySelectorAll('*'));
+            siblings.forEach(el => {
+              if (el !== img && typeof el.textContent === 'string' && el.textContent.trim() === 'US') {
+                el.style.display = 'none';
+              }
+            });
+          } catch(e){}
+        } else {
+          // keep existing behaviour if not found
+          console.warn('profile.jpg not reachable', r.status);
+        }
+      }).catch(err => {
+        // fallback: set src anyway (may use cached file)
+        img.src = desired;
+        console.warn('profile HEAD fetch failed', err);
+      });
+    })();
+    </script>
+  </body>
+</html>
