@@ -113,7 +113,7 @@
     <script>
       // Ensure a global API_URL is available without redeclaring it.
       if (typeof window.API_URL === 'undefined') {
-        window.API_URL = (function(){ try{ const loc=new URL(location.href); return `${loc.protocol}//${loc.hostname}:3000`; }catch(e){ return 'http://localhost:3000'; } })();
+        window.API_URL = "https://belajar-indo.vercel.app";
       }
 
       // Profile page does not perform any server-side session checks.

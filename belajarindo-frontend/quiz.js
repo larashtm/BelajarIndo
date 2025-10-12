@@ -49,7 +49,7 @@ if (typeof getTimeSpent !== 'function') {
   async function submitViaFetch(payload) {
     const token = localStorage.getItem('token');
     // Determine API URL - try multiple possibilities
-    let apiUrl = 'http://localhost:5000';
+    let apiUrl = 'https://belajar-indo.vercel.app';
     if (typeof API_URL !== 'undefined') apiUrl = API_URL;
     else if (window.API_URL) apiUrl = window.API_URL;
     

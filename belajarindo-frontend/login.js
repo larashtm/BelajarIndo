@@ -1,5 +1,5 @@
 let slideIndex = 1;
-window.API_URL = "http://localhost:3000";
+window.API_URL = "https://belajar-indo.vercel.app";
 
 function showLogin() {
     document.getElementById('loginForm').classList.add('active');
