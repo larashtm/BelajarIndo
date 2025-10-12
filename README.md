@@ -1,126 +1,154 @@
-# BelajarIndo — Local Development Guide
 
-Aplikasi pembelajaran Bahasa Indonesia berbasis web
-📦 **Stack:** Node.js + Express + Prisma + MySQL + HTML/CSS/JS
+# BelajarIndo — Indonesian Virtual Lab  
 
----
+> 🌸 *Learn Bahasa Indonesia interactively — with flashcards, quizzes, and motivation boosts!*  
 
-## Ringkasan
-
-* **Backend:** `belajarindo-backend`
-* **Frontend:** statis di root (`index.html`, `login.html`, dst)
-
----
-
-## 🧩 Prasyarat
-
-* Node.js ≥ v18
-* MySQL server (local/remote)
-* PowerShell (Windows) / Bash (Linux/macOS)
+[![Node.js](https://img.shields.io/badge/Node.js-18+-green?logo=node.js)](https://nodejs.org/)  
+[![Express.js](https://img.shields.io/badge/Backend-Express.js-black?logo=express)](https://expressjs.com/)  
+[![Prisma](https://img.shields.io/badge/ORM-Prisma-blue?logo=prisma)](https://www.prisma.io/)  
+[![MySQL](https://img.shields.io/badge/Database-MySQL-orange?logo=mysql)](https://www.mysql.com/)  
+[![Bootstrap](https://img.shields.io/badge/UI-Bootstrap_5-purple?logo=bootstrap)](https://getbootstrap.com/)  
+[![Animate.css](https://img.shields.io/badge/Animation-Animate.css-pink)](https://animate.style/)  
 
 ---
 
-## ⚙️ Setup Cepat
+## 🧠 Tentang  
+**BelajarIndo** adalah *virtual lab* pembelajaran Bahasa Indonesia berbasis web, dikembangkan menggunakan **Node.js + Express + Prisma + MySQL** di sisi backend, serta **HTML, CSS, Bootstrap, dan JavaScript** di sisi frontend.  
 
-### 1️⃣ Konfigurasi `.env`
+✨ **Fitur utama:**  
+- 🎴 **Vocabulary Flashcards** dengan audio pelafalan (Text-to-Speech)  
+- 🧩 **Interactive Quiz** dengan penyimpanan hasil ke backend  
+- 💬 **Motivational quotes** dinamis  
+- 👤 **User authentication** (login/register, profile)  
+- 📱 **Responsif** — dapat dibuka di laptop, tablet, maupun smartphone  
 
-Buat file `.env` di folder `belajarindo-backend`:
+🔗 Demo (frontend): [https://larashtm.github.io/BelajarIndo/](https://larashtm.github.io/BelajarIndo/)  
+🔗 Backend (API): [https://belajar-indo.vercel.app](https://belajar-indo.vercel.app)
+
+---
+
+## 📂 Struktur Proyek  
+
+```
+
+BelajarIndo/
+├── index.html                 # Halaman utama (hero, features, motivation)
+├── login.html, profile.html   # Halaman auth dan profil
+├── assets/                    # Gambar, icon, CSS
+│   ├── images/
+│   ├── icon/
+│   └── dist/css/style.css
+├── belajarindo-backend/       # Folder backend (Express + Prisma)
+│   ├── src/
+│   ├── prisma/
+│   └── scripts/
+└── README.md
+
+````
+
+---
+
+## 🧩 Prasyarat  
+
+- [Node.js](https://nodejs.org/) v18 atau lebih baru  
+- [MySQL](https://dev.mysql.com/downloads/) (local atau remote)  
+- PowerShell / Bash  
+
+---
+
+## ⚙️ Setup Backend  
+
+```bash
+cd belajarindo-backend
+cp .env.example .env   # jika belum ada, buat manual
+npm install
+````
+
+**Isi file `.env`:**
 
 ```env
 DATABASE_URL="mysql://USER:PASSWORD@HOST:PORT/DATABASE"
-JWT_SECRET="some_secret_here"
+JWT_SECRET="your_secret_here"
 NODE_ENV=development
 ```
 
-### 2️⃣ Instalasi
+Sinkronisasi Prisma:
 
 ```bash
-cd belajarindo-backend
-npm install
-```
-
-### 3️⃣ Prisma Sync
-
-```bash
-# Jika punya akses DDL
+# jika punya akses DDL
 npx prisma migrate dev --name init
-
-# Jika tidak
+# jika akses terbatas
 npx prisma db push
-
-# Generate Prisma Client
 npx prisma generate
 ```
 
-> 💡 **Windows Tip:**
-> Jika error EPERM saat `prisma generate`:
->
-> 1. Tutup semua proses Node (`taskkill /F /IM node.exe`)
-> 2. Hapus file `.tmp` di `.prisma/client`
-> 3. Jalankan ulang `npx prisma generate`
+> 💡 **Tips Windows:** jika `npx prisma generate` error `EPERM`, hentikan semua proses Node dan hapus `.tmp` di `.prisma/client`.
 
 ---
 
-## ▶️ Jalankan Server
+## ▶️ Menjalankan Server
+
+**Backend:**
 
 ```bash
 cd belajarindo-backend
-npm run dev   # atau node src/index.js
+npm run dev
 ```
 
-Frontend dapat dijalankan via Python server:
+**Frontend (dari root proyek):**
 
 ```bash
 python -m http.server 5500
-# buka http://localhost:5500/login.html
+# buka http://localhost:5500
 ```
 
 ---
 
-## 🧪 Tes Cepat API
+## 🧪 Fitur Utama Frontend
 
-| Endpoint                  | Method   | Deskripsi                       |
-| ------------------------- | -------- | ------------------------------- |
-| `/api/auth/login`         | POST     | Login demo user                 |
-| `/api/auth/me`            | GET      | Ambil info user aktif           |
-| `/api/quiz/submit`        | POST     | Kirim hasil kuis                |
-| `/api/quiz/history`       | GET      | Lihat riwayat kuis              |
-| `/api/flashcard/progress` | GET/POST | Simpan & ambil progres kosakata |
+### 🎴 Vocabulary (Flashcard Mode)
 
-Contoh login dengan curl:
+* Klik **“Try Now”** → tampilkan flashcard dengan audio pelafalan.
+* Kategori: 🍽️ Food & Drinks, 👨‍👩‍👧‍👦 Family, 🏠 Daily Activities.
+* Navigasi: Next / Previous / Exit.
+* Teks dan audio bilingual: Bahasa Indonesia & Inggris.
 
-```bash
-curl -X POST http://localhost:3000/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"email":"demo@local","password":"123456"}'
-```
+### 🧩 Quiz Interaktif
+
+* Klik **“Try Now”** di fitur Quiz untuk mulai tantangan.
+* Skor otomatis disimpan ke backend (`/api/quiz/submit`).
+* Riwayat bisa dilihat di **“View History”**.
+
+### 💬 Motivational Quotes
+
+Tombol “New Motivation” menampilkan kutipan acak:
+
+> “Learning a language is like opening a door to a new world.”
+
+### 👤 Profile & Authentication
+
+* Autentikasi berbasis **JWT** dan disimpan di `localStorage`.
+* Jika belum login, user otomatis diarahkan ke `login.html`.
+* Setelah login, tombol “Profile” muncul di navbar.
 
 ---
 
 ## 🧰 Troubleshooting
 
-* **PrismaClientValidationError:** pastikan payload sesuai schema.
-* **Cookie tidak terbaca:** pastikan CORS dan `credentials: 'include'` di fetch frontend.
-* **EPERM error:** lihat catatan Windows di atas.
+| Masalah                         | Solusi                                                           |
+| ------------------------------- | ---------------------------------------------------------------- |
+| ❌ `PrismaClientValidationError` | Periksa field dan schema Prisma                                  |
+| 🍪 Cookie tidak terbaca         | Pastikan `credentials: 'include'` di fetch frontend              |
+| 🪟 EPERM di Windows             | Stop proses node, hapus `.tmp`, jalankan ulang `prisma generate` |
 
 ---
 
-## 📂 Skrip Utilitas
+## ✨ Credits
 
-* `scripts/check-demo-user.js` — cek apakah demo user ada
-* `scripts/check-quiz-vocab.js` — tampilkan hasil kuis & progress vocab
+Dibuat dengan ❤️ oleh **[Laras Hati Mahendra](https://github.com/larashtm)**
 
----
-
-## 🧭 Catatan Pengembangan
-
-* Gunakan `migrate dev` untuk pengembangan (dengan akses DDL)
-* Gunakan `db push` untuk sinkronisasi cepat tanpa migrasi file
+> “Belajar bahasa bukan sekadar kata — tapi memahami dunia di baliknya.”
 
 ---
 
-✨ **BelajarIndo** — belajar bahasa Indonesia kapan pun, di mana pun.
-
----
-
-Apakah kamu mau aku buatkan **versi README yang ada emoji + badge GitHub (misalnya build status, tech stack, dsb)** biar tampil lebih menarik di halaman repo GitHub juga?
+⭐ **Bantu proyek ini tumbuh** dengan memberi star di repo GitHub!
