@@ -10,22 +10,22 @@
 
 */
 -- DropForeignKey
-ALTER TABLE `flashcardprogress` DROP FOREIGN KEY `FlashcardProgress_userId_fkey`;
+ALTER TABLE `FlashcardProgress` DROP FOREIGN KEY `FlashcardProgress_userId_fkey`;
 
 -- DropForeignKey
-ALTER TABLE `quizresult` DROP FOREIGN KEY `QuizResult_userId_fkey`;
+ALTER TABLE `QuizResult` DROP FOREIGN KEY `QuizResult_userId_fkey`;
 
 -- AlterTable
-ALTER TABLE `quizresult` DROP COLUMN `answers`,
+ALTER TABLE `QuizResult` DROP COLUMN `answers`,
     DROP COLUMN `quizType`,
     ADD COLUMN `quizCategory` VARCHAR(191) NOT NULL,
     MODIFY `score` DOUBLE NOT NULL;
 
 -- AlterTable
-ALTER TABLE `user` ADD COLUMN `updatedAt` DATETIME(3) NOT NULL;
+ALTER TABLE `User` ADD COLUMN `updatedAt` DATETIME(3) NOT NULL;
 
 -- DropTable
-DROP TABLE `flashcardprogress`;
+DROP TABLE `FlashcardProgress`;
 
 -- CreateTable
 CREATE TABLE `QuizProgress` (
@@ -64,4 +64,4 @@ ALTER TABLE `QuizResult` ADD CONSTRAINT `QuizResult_userId_fkey` FOREIGN KEY (`u
 ALTER TABLE `VocabProgress` ADD CONSTRAINT `VocabProgress_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- RenameIndex
-ALTER TABLE `quizresult` RENAME INDEX `QuizResult_userId_fkey` TO `QuizResult_userId_idx`;
+ALTER TABLE `QuizResult` RENAME INDEX `QuizResult_userId_fkey` TO `QuizResult_userId_idx`;
