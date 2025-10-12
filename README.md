@@ -1,78 +1,74 @@
-Oke! 🎉 Berikut versi **README yang lebih singkat + estetis + punya emoji dan badge GitHub-style** — cocok banget buat dipasang langsung di repo kamu biar terlihat profesional dan enak dibaca 👇
+# BelajarIndo — Local Development Guide
+
+Aplikasi pembelajaran Bahasa Indonesia berbasis web
+📦 **Stack:** Node.js + Express + Prisma + MySQL + HTML/CSS/JS
 
 ---
 
-````markdown
-# 🇮🇩 BelajarIndo — Aplikasi Pembelajaran Bahasa Indonesia  
+## Ringkasan
 
-> 🌸 *Belajar kapan pun dan di mana pun — dengan flashcard, kuis, dan audio pronunciation!*  
-
-![Node.js](https://img.shields.io/badge/Node.js-18+-green?logo=node.js)
-![Express](https://img.shields.io/badge/Express.js-black?logo=express)
-![Prisma](https://img.shields.io/badge/Prisma-ORM-blue?logo=prisma)
-![MySQL](https://img.shields.io/badge/MySQL-DB-orange?logo=mysql)
-![Frontend](https://img.shields.io/badge/Frontend-HTML%2FCSS%2FJS-yellow?logo=html5)
+* **Backend:** `belajarindo-backend`
+* **Frontend:** statis di root (`index.html`, `login.html`, dst)
 
 ---
 
-## 🧠 Ringkasan  
-**BelajarIndo** adalah aplikasi pembelajaran Bahasa Indonesia berbasis web:  
-- 🌐 **Frontend:** HTML, CSS, JS (statis di root)  
-- ⚙️ **Backend:** Node.js + Express + Prisma + MySQL  
-- 🎯 Target: mahasiswa, pelajar, dan komunitas internasional  
+## 🧩 Prasyarat
+
+* Node.js ≥ v18
+* MySQL server (local/remote)
+* PowerShell (Windows) / Bash (Linux/macOS)
 
 ---
 
-## 🧩 Prasyarat  
-Pastikan sudah terpasang:
-- [Node.js](https://nodejs.org/) ≥ v18  
-- [MySQL](https://dev.mysql.com/downloads/) server  
-- PowerShell (Windows) atau Bash (Linux/macOS)
+## ⚙️ Setup Cepat
 
----
+### 1️⃣ Konfigurasi `.env`
 
-## ⚙️ Setup Cepat  
+Buat file `.env` di folder `belajarindo-backend`:
 
-### 1️⃣ Buat file `.env` di `belajarindo-backend`
 ```env
 DATABASE_URL="mysql://USER:PASSWORD@HOST:PORT/DATABASE"
 JWT_SECRET="some_secret_here"
 NODE_ENV=development
-````
+```
 
-### 2️⃣ Install dependency
+### 2️⃣ Instalasi
 
 ```bash
 cd belajarindo-backend
 npm install
 ```
 
-### 3️⃣ Sinkronisasi Prisma
+### 3️⃣ Prisma Sync
 
 ```bash
-# Pilih sesuai akses DB
-npx prisma migrate dev --name init     # untuk dev penuh
-npx prisma db push                     # untuk akses terbatas
+# Jika punya akses DDL
+npx prisma migrate dev --name init
+
+# Jika tidak
+npx prisma db push
 
 # Generate Prisma Client
 npx prisma generate
 ```
 
-> 💡 **Catatan Windows:**
-> Jika `EPERM` error, hentikan proses Node (`taskkill /F /IM node.exe`), hapus file `.tmp` di `.prisma/client`, lalu jalankan ulang `npx prisma generate`.
+> 💡 **Windows Tip:**
+> Jika error EPERM saat `prisma generate`:
+>
+> 1. Tutup semua proses Node (`taskkill /F /IM node.exe`)
+> 2. Hapus file `.tmp` di `.prisma/client`
+> 3. Jalankan ulang `npx prisma generate`
 
 ---
 
 ## ▶️ Jalankan Server
-
-### Backend
 
 ```bash
 cd belajarindo-backend
 npm run dev   # atau node src/index.js
 ```
 
-### Frontend
+Frontend dapat dijalankan via Python server:
 
 ```bash
 python -m http.server 5500
@@ -83,15 +79,15 @@ python -m http.server 5500
 
 ## 🧪 Tes Cepat API
 
-| Endpoint                  | Method   | Keterangan         |
-| ------------------------- | -------- | ------------------ |
-| `/api/auth/login`         | POST     | Login demo user    |
-| `/api/auth/me`            | GET      | Ambil info user    |
-| `/api/quiz/submit`        | POST     | Kirim hasil kuis   |
-| `/api/quiz/history`       | GET      | Lihat riwayat kuis |
-| `/api/flashcard/progress` | GET/POST | Progres kosakata   |
+| Endpoint                  | Method   | Deskripsi                       |
+| ------------------------- | -------- | ------------------------------- |
+| `/api/auth/login`         | POST     | Login demo user                 |
+| `/api/auth/me`            | GET      | Ambil info user aktif           |
+| `/api/quiz/submit`        | POST     | Kirim hasil kuis                |
+| `/api/quiz/history`       | GET      | Lihat riwayat kuis              |
+| `/api/flashcard/progress` | GET/POST | Simpan & ambil progres kosakata |
 
-**Contoh login (curl):**
+Contoh login dengan curl:
 
 ```bash
 curl -X POST http://localhost:3000/api/auth/login \
@@ -103,43 +99,28 @@ curl -X POST http://localhost:3000/api/auth/login \
 
 ## 🧰 Troubleshooting
 
-| Masalah                         | Solusi Cepat                                  |
-| ------------------------------- | --------------------------------------------- |
-| ❌ `PrismaClientValidationError` | Cek payload vs schema                         |
-| 🍪 Token/cookie tidak terbaca   | Pastikan `credentials: 'include'` di frontend |
-| 🪟 EPERM error di Windows       | Lihat catatan di atas                         |
+* **PrismaClientValidationError:** pastikan payload sesuai schema.
+* **Cookie tidak terbaca:** pastikan CORS dan `credentials: 'include'` di fetch frontend.
+* **EPERM error:** lihat catatan Windows di atas.
 
 ---
 
 ## 📂 Skrip Utilitas
 
-📜 `scripts/check-demo-user.js` — cek demo user
-📜 `scripts/check-quiz-vocab.js` — tampilkan quiz & vocab progress
+* `scripts/check-demo-user.js` — cek apakah demo user ada
+* `scripts/check-quiz-vocab.js` — tampilkan hasil kuis & progress vocab
 
 ---
 
 ## 🧭 Catatan Pengembangan
 
-* 🧱 Gunakan `migrate dev` untuk development penuh
-* ⚡ Gunakan `db push` untuk update cepat ke DB tanpa migrasi file
+* Gunakan `migrate dev` untuk pengembangan (dengan akses DDL)
+* Gunakan `db push` untuk sinkronisasi cepat tanpa migrasi file
 
 ---
 
-## 💬 Tentang Proyek
-
-BelajarIndo membantu pembelajar bahasa Indonesia dengan pengalaman interaktif —
-flashcard kosakata 🎴, kuis cepat 🧩, dan audio pronunciation 🔊.
+✨ **BelajarIndo** — belajar bahasa Indonesia kapan pun, di mana pun.
 
 ---
 
-👩‍💻 **Dibuat oleh [Laras Hati Mahendra](https://github.com/larashtm)**
-⭐ *Jika proyek ini membantu, jangan lupa beri star di repo!* 🌟
-
----
-
-```
-
----
-
-Apakah kamu mau aku tambahkan juga **section "Deployment (Docker Compose)"** + badge “Build passing / Deployed on Render / Railway” biar README-nya kelihatan seperti proyek production-ready?
-```
+Apakah kamu mau aku buatkan **versi README yang ada emoji + badge GitHub (misalnya build status, tech stack, dsb)** biar tampil lebih menarik di halaman repo GitHub juga?
