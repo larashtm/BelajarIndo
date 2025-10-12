@@ -40,11 +40,15 @@ router.post('/login', async (req, res) => {
     const validPassword = await bcrypt.compare(password, user.password);
     if (!validPassword) return res.status(400).json({ error: 'Email atau password salah' });
 
-  const token = generateToken(user.id);
-  res.cookie('token', token, { httpOnly: true, secure: process.env.NODE_ENV === 'production', maxAge: 7 * 24 * 60 * 60 * 1000 });
+    console.log(`User logged in with ID: ${user.id}`);
 
-  // Return token in response to support Authorization header for frontend
-  res.json({ success: true, user: { id: user.id, name: user.name, email: user.email }, token });
+    const token = generateToken(user.id);
+
+    console.log(`Generated token for user: ${token}`);
+    res.cookie('token', token, { httpOnly: true, secure: process.env.NODE_ENV === 'production', maxAge: 7 * 24 * 60 * 60 * 1000 });
+  
+    // Return token in response to support Authorization header for frontend
+    res.json({ success: true, user: { id: user.id, name: user.name, email: user.email }, token });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Server error' });
@@ -60,11 +64,16 @@ router.post('/logout', (req, res) => {
 // Me
 router.get('/me', async (req, res) => {
   try {
-    const token = req.cookies.token;
+    const token = req.headers.authorization.split(' ')[1];
+
+    console.log(`User requested profile with token: ${token}`);
+
     if (!token) return res.status(401).json({ error: 'Not authenticated' });
 
     const decoded = verifyToken(token);
     if (!decoded) return res.status(401).json({ error: 'Invalid token' });
+
+    console.log(`User requested profile with ID: ${decoded.userId}`);
 
     const user = await prisma.user.findUnique({ where: { id: decoded.userId }, select: { id: true, name: true, email: true } });
     res.json({ user });
