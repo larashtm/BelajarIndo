@@ -20,15 +20,7 @@ app.use(cookieParser());
 // Override FRONTEND_ORIGIN in .env if needed (example: http://localhost:5500)
 const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN || 'http://localhost:5500';
 const allowedOrigins = [FRONTEND_ORIGIN, 'http://127.0.0.1:5500'];
-app.use(cors({
-  origin: (origin, callback) => {
-    // allow requests with no origin (curl, postman)
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) return callback(null, true);
-    return callback(new Error('CORS not allowed by server'));
-  },
-  credentials: true
-}));
+app.use(cors());
 
 // Serve static uploads (before routes so frontend can fetch files)
 app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
