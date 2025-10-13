@@ -6,14 +6,14 @@
 [![Node.js](https://img.shields.io/badge/Node.js-18+-green?logo=node.js)](https://nodejs.org/)  
 [![Express.js](https://img.shields.io/badge/Backend-Express.js-black?logo=express)](https://expressjs.com/)  
 [![Prisma](https://img.shields.io/badge/ORM-Prisma-blue?logo=prisma)](https://www.prisma.io/)  
-[![MySQL](https://img.shields.io/badge/Database-MySQL-orange?logo=mysql)](https://www.mysql.com/)  
+[![Postgres](https://img.shields.io/badge/Database-Postgres-blue?logo=postgresql)](https://www.postgresql.org/)  
 [![Bootstrap](https://img.shields.io/badge/UI-Bootstrap_5-purple?logo=bootstrap)](https://getbootstrap.com/)  
 [![Animate.css](https://img.shields.io/badge/Animation-Animate.css-pink)](https://animate.style/)  
 
 ---
 
 ## 🧠 Tentang  
-**BelajarIndo** adalah *virtual lab* pembelajaran Bahasa Indonesia berbasis web, dikembangkan menggunakan **Node.js + Express + Prisma + MySQL** di sisi backend, serta **HTML, CSS, Bootstrap, dan JavaScript** di sisi frontend.  
+**BelajarIndo** adalah *virtual lab* pembelajaran Bahasa Indonesia berbasis web, dikembangkan menggunakan **Node.js + Express + Prisma + PostgreSQL** di sisi backend, serta **HTML, CSS, Bootstrap, dan JavaScript** di sisi frontend.  
 
 ✨ **Fitur utama:**  
 - 🎴 **Vocabulary Flashcards** dengan audio pelafalan (Text-to-Speech)  
@@ -51,7 +51,7 @@ BelajarIndo/
 ## 🧩 Prasyarat  
 
 - [Node.js](https://nodejs.org/) v18 atau lebih baru  
-- [MySQL](https://dev.mysql.com/downloads/) (local atau remote)  
+- [PostgreSQL](https://www.postgresql.org/download/) (local atau remote)  
 - PowerShell / Bash  
 
 ---
@@ -67,7 +67,7 @@ npm install
 **Isi file `.env`:**
 
 ```env
-DATABASE_URL="mysql://USER:PASSWORD@HOST:PORT/DATABASE"
+DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DATABASE"
 JWT_SECRET="your_secret_here"
 NODE_ENV=development
 ```

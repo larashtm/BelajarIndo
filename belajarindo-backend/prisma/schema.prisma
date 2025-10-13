@@ -3,19 +3,19 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  name      String
-  email     String   @unique
-  password  String   // hashed password
-  salt      String   // untuk bcrypt
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  
+  id            Int              @id @default(autoincrement())
+  name          String
+  email         String           @unique
+  password      String
+  salt          String
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
   // Relations
   quizProgress  QuizProgress[]
   quizResults   QuizResult[]
@@ -25,14 +25,14 @@ model User {
 model QuizProgress {
   id              Int      @id @default(autoincrement())
   userId          Int
-  quizCategory    String   // 'basic', 'intermediate', 'advanced'
-  progress        Int      @default(0) // 0-100
-  state           Json?    // arbitrary JSON snapshot of quiz (answers, etc.)
+  quizCategory    String   // contoh: 'basic', 'intermediate', 'advanced'
+  progress        Int      @default(0)
+  state           Json?    // snapshot jawaban user
   currentQuestion Int      @default(0)
   lastAccessed    DateTime @default(now())
-  
+
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+
   @@unique([userId, quizCategory])
   @@index([userId])
 }
@@ -41,26 +41,26 @@ model QuizResult {
   id             Int      @id @default(autoincrement())
   userId         Int
   quizCategory   String
-  score          Float    // nilai 0-100
+  score          Float
   totalQuestions Int
   correctAnswers Int
   timeSpent      Int      // dalam detik
   completedAt    DateTime @default(now())
-  
+
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+
   @@index([userId])
 }
 
 model VocabProgress {
   id           Int      @id @default(autoincrement())
   userId       Int
-  category     String   // 'makanan', 'keluarga', 'sehari'
-  wordsLearned Json     // array of word IDs yang sudah dipelajari
+  category     String   // contoh: 'makanan', 'keluarga', 'sehari-hari'
+  wordsLearned Json     // array berisi ID kata yang sudah dipelajari
   lastAccessed DateTime @default(now())
-  
+
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+
   @@unique([userId, category])
   @@index([userId])
 }

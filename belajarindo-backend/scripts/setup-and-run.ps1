@@ -2,7 +2,7 @@
 Automated setup-and-run helper for BelajarIndo backend (PowerShell)
 
 What this script does (interactive):
- - Optionally start a local MySQL Docker container (mysql:8)
+ - Optionally start a local PostgreSQL Docker container (postgres:15)
  - Create a .env file from sensible defaults (if not present)
  - Run `npm install` in backend
  - Ensure prisma CLI available, run migrations (or `db push` as fallback)
@@ -34,8 +34,8 @@ $EnvExample = Join-Path $BackendDir '.env.example'
 Write-Host "Script directory: $ScriptDir"
 Write-Host "Backend directory: $BackendDir"
 
-# 1) Optionally start MySQL via Docker
-$useDocker = Read-Host "Start local MySQL Docker container? (Y/n) [Default: Y]"
+# 1) Optionally start PostgreSQL via Docker
+$useDocker = Read-Host "Start local Postgres Docker container? (Y/n) [Default: Y]"
 if ([string]::IsNullOrWhiteSpace($useDocker)) { $useDocker = 'Y' }
 if ($useDocker -match '^[Yy]') {
     try {
@@ -45,32 +45,33 @@ if ($useDocker -match '^[Yy]') {
         $useDocker = 'n'
     }
 }
-
++
 if ($useDocker -match '^[Yy]') {
     # check existing container
-    $existing = docker ps -a --filter "name=belajarindo-mysql" --format "{{.Names}}:{{.Status}}" 2>$null
+    $existing = docker ps -a --filter "name=belajarindo-postgres" --format "{{.Names}}:{{.Status}}" 2>$null
     if ($existing) {
         WriteInfo "Found existing container: $existing"
-        $isRunning = docker ps --filter "name=belajarindo-mysql" --format "{{.Names}}" 2>$null
+        $isRunning = docker ps --filter "name=belajarindo-postgres" --format "{{.Names}}" 2>$null
         if (-not $isRunning) {
-            WriteInfo "Starting existing container 'belajarindo-mysql'..."
-            docker start belajarindo-mysql | Write-Host
+            WriteInfo "Starting existing container 'belajarindo-postgres'..."
+            docker start belajarindo-postgres | Write-Host
         } else {
             WriteInfo "Container is already running."
         }
     } else {
-        WriteInfo "Pulling mysql:8 image and starting container 'belajarindo-mysql'..."
-        docker run --name belajarindo-mysql -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=belajarindo -p 3306:3306 -d mysql:8 | Write-Host
+        WriteInfo "Pulling postgres:15 image and starting container 'belajarindo-postgres'..."
+        # Postgres default ports: 5432
+        docker run --name belajarindo-postgres -e POSTGRES_PASSWORD=root -e POSTGRES_DB=belajarindo -p 5432:5432 -d postgres:15 | Write-Host
         Start-Sleep -Seconds 8
     }
     # quick health check
-    Write-Host "Waiting 6s for MySQL to initialize..."
+    Write-Host "Waiting 6s for Postgres to initialize..."
     Start-Sleep -Seconds 6
     try {
-        docker exec belajarindo-mysql mysql -uroot -proot -e "SELECT VERSION();" | Out-Null
-        WriteOk "MySQL container reachable"
+        docker exec belajarindo-postgres psql -U postgres -d belajarindo -c "SELECT version();" | Out-Null
+        WriteOk "Postgres container reachable"
     } catch {
-        WriteWarn "MySQL container may not be ready yet. If migrate fails, wait a bit and retry."
+        WriteWarn "Postgres container may not be ready yet. If migrate fails, wait a bit and retry."
     }
 }
 
@@ -79,13 +80,13 @@ if (-Not (Test-Path $EnvFile)) {
     if (Test-Path $EnvExample) {
         WriteInfo ".env not found; creating from .env.example (you should review values)."
         Copy-Item -Path $EnvExample -Destination $EnvFile -Force
-        (Get-Content $EnvFile) -replace 'DATABASE_URL=.*', 'DATABASE_URL="mysql://root:root@127.0.0.1:3306/belajarindo"' | Set-Content $EnvFile
+    (Get-Content $EnvFile) -replace 'DATABASE_URL=.*', 'DATABASE_URL="postgresql://postgres:root@127.0.0.1:5432/belajarindo"' | Set-Content $EnvFile
         (Get-Content $EnvFile) -replace 'JWT_SECRET=.*', 'JWT_SECRET="dev-secret-change-me"' | Set-Content $EnvFile
         WriteOk ".env created at $EnvFile"
     } else {
         WriteInfo ".env.example not found. Creating minimal .env with defaults."
-        @"
-DATABASE_URL="mysql://root:root@127.0.0.1:3306/belajarindo"
+    @"
+DATABASE_URL="postgresql://postgres:root@127.0.0.1:5432/belajarindo"
 JWT_SECRET="dev-secret-change-me"
 NODE_ENV=development
 PORT=3000
