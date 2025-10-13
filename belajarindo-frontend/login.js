@@ -85,16 +85,9 @@ async function saveAccount(name, email, password) {
     if (!res.ok) {
         throw Error("Register Error")
     }
-
-    const accounts = JSON.parse(localStorage.getItem('accounts') || '[]');
-    const newAccount = { name, email, password };
-    accounts.push(newAccount);
-    localStorage.setItem('accounts', JSON.stringify(accounts));
 }
 
 async function validateLogin(email, password) {
-    const accounts = JSON.parse(localStorage.getItem('accounts') || '[]');
-
     const res = await fetch(`${window.API_URL}/api/auth/login`, {
         headers: {
             "Content-Type": "application/json"
@@ -117,35 +110,7 @@ async function validateLogin(email, password) {
     return user;
 }
 
-function checkEmailExists(email) {
-    const accounts = JSON.parse(localStorage.getItem('accounts') || '[]');
-    return accounts.some(account => account.email === email);
-}
-
-function createDefaultAccounts() {
-    const accounts = JSON.parse(localStorage.getItem('accounts') || '[]');
-    
-    // Only create demo accounts if no accounts exist
-    if (accounts.length === 0) {
-        const demoAccounts = [
-            { name: 'Demo User', email: 'demo@belajarindo.com', password: '123456' },
-            { name: 'Test User', email: 'test@gmail.com', password: 'test123' },
-            { name: 'Admin', email: 'admin@belajarindo.com', password: 'admin123' }
-        ];
-        
-        localStorage.setItem('accounts', JSON.stringify(demoAccounts));
-        console.log('Demo accounts created successfully!');
-        console.log('Available demo accounts:');
-        demoAccounts.forEach(acc => {
-            console.log(`Email: ${acc.email}, Password: ${acc.password}`);
-        });
-    }
-}
-
 document.addEventListener('DOMContentLoaded', function() {
-    // Create default demo accounts if none exist
-    createDefaultAccounts();
-    
     // Auto slide every 5 seconds
     setInterval(nextSlide, 5000);
     
@@ -233,12 +198,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const name = document.getElementById('name').value;
         const email = document.getElementById('signupEmail').value;
         const password = document.getElementById('signupPassword').value;
-        
-        // Check if email already exists
-        if (checkEmailExists(email)) {
-            showModal('Pendaftaran Gagal!', 'Email sudah terdaftar. Silakan gunakan email lain atau login.', 'warning');
-            return;
-        }
         
         // Save new account
         try {
