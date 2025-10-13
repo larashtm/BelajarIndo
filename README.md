@@ -1,145 +1,154 @@
-Oke! 🎉 Berikut versi **README yang lebih singkat + estetis + punya emoji dan badge GitHub-style** — cocok banget buat dipasang langsung di repo kamu biar terlihat profesional dan enak dibaca 👇
+
+# BelajarIndo — Indonesian Virtual Lab  
+
+> 🌸 *Learn Bahasa Indonesia interactively — with flashcards, quizzes, and motivation boosts!*  
+
+[![Node.js](https://img.shields.io/badge/Node.js-18+-green?logo=node.js)](https://nodejs.org/)  
+[![Express.js](https://img.shields.io/badge/Backend-Express.js-black?logo=express)](https://expressjs.com/)  
+[![Prisma](https://img.shields.io/badge/ORM-Prisma-blue?logo=prisma)](https://www.prisma.io/)  
+[![MySQL](https://img.shields.io/badge/Database-MySQL-orange?logo=mysql)](https://www.mysql.com/)  
+[![Bootstrap](https://img.shields.io/badge/UI-Bootstrap_5-purple?logo=bootstrap)](https://getbootstrap.com/)  
+[![Animate.css](https://img.shields.io/badge/Animation-Animate.css-pink)](https://animate.style/)  
 
 ---
 
-````markdown
-# 🇮🇩 BelajarIndo — Aplikasi Pembelajaran Bahasa Indonesia  
+## 🧠 Tentang  
+**BelajarIndo** adalah *virtual lab* pembelajaran Bahasa Indonesia berbasis web, dikembangkan menggunakan **Node.js + Express + Prisma + MySQL** di sisi backend, serta **HTML, CSS, Bootstrap, dan JavaScript** di sisi frontend.  
 
-> 🌸 *Belajar kapan pun dan di mana pun — dengan flashcard, kuis, dan audio pronunciation!*  
+✨ **Fitur utama:**  
+- 🎴 **Vocabulary Flashcards** dengan audio pelafalan (Text-to-Speech)  
+- 🧩 **Interactive Quiz** dengan penyimpanan hasil ke backend  
+- 💬 **Motivational quotes** dinamis  
+- 👤 **User authentication** (login/register, profile)  
+- 📱 **Responsif** — dapat dibuka di laptop, tablet, maupun smartphone  
 
-![Node.js](https://img.shields.io/badge/Node.js-18+-green?logo=node.js)
-![Express](https://img.shields.io/badge/Express.js-black?logo=express)
-![Prisma](https://img.shields.io/badge/Prisma-ORM-blue?logo=prisma)
-![MySQL](https://img.shields.io/badge/MySQL-DB-orange?logo=mysql)
-![Frontend](https://img.shields.io/badge/Frontend-HTML%2FCSS%2FJS-yellow?logo=html5)
+🔗 Demo (frontend): [https://larashtm.github.io/BelajarIndo/](https://larashtm.github.io/BelajarIndo/)  
+🔗 Backend (API): [https://belajar-indo.vercel.app](https://belajar-indo.vercel.app)
 
 ---
 
-## 🧠 Ringkasan  
-**BelajarIndo** adalah aplikasi pembelajaran Bahasa Indonesia berbasis web:  
-- 🌐 **Frontend:** HTML, CSS, JS (statis di root)  
-- ⚙️ **Backend:** Node.js + Express + Prisma + MySQL  
-- 🎯 Target: mahasiswa, pelajar, dan komunitas internasional  
+## 📂 Struktur Proyek  
+
+```
+
+BelajarIndo/
+├── index.html                 # Halaman utama (hero, features, motivation)
+├── login.html, profile.html   # Halaman auth dan profil
+├── assets/                    # Gambar, icon, CSS
+│   ├── images/
+│   ├── icon/
+│   └── dist/css/style.css
+├── belajarindo-backend/       # Folder backend (Express + Prisma)
+│   ├── src/
+│   ├── prisma/
+│   └── scripts/
+└── README.md
+
+````
 
 ---
 
 ## 🧩 Prasyarat  
-Pastikan sudah terpasang:
-- [Node.js](https://nodejs.org/) ≥ v18  
-- [MySQL](https://dev.mysql.com/downloads/) server  
-- PowerShell (Windows) atau Bash (Linux/macOS)
+
+- [Node.js](https://nodejs.org/) v18 atau lebih baru  
+- [MySQL](https://dev.mysql.com/downloads/) (local atau remote)  
+- PowerShell / Bash  
 
 ---
 
-## ⚙️ Setup Cepat  
-
-### 1️⃣ Buat file `.env` di `belajarindo-backend`
-```env
-DATABASE_URL="mysql://USER:PASSWORD@HOST:PORT/DATABASE"
-JWT_SECRET="some_secret_here"
-NODE_ENV=development
-````
-
-### 2️⃣ Install dependency
+## ⚙️ Setup Backend  
 
 ```bash
 cd belajarindo-backend
+cp .env.example .env   # jika belum ada, buat manual
 npm install
+````
+
+**Isi file `.env`:**
+
+```env
+DATABASE_URL="mysql://USER:PASSWORD@HOST:PORT/DATABASE"
+JWT_SECRET="your_secret_here"
+NODE_ENV=development
 ```
 
-### 3️⃣ Sinkronisasi Prisma
+Sinkronisasi Prisma:
 
 ```bash
-# Pilih sesuai akses DB
-npx prisma migrate dev --name init     # untuk dev penuh
-npx prisma db push                     # untuk akses terbatas
-
-# Generate Prisma Client
+# jika punya akses DDL
+npx prisma migrate dev --name init
+# jika akses terbatas
+npx prisma db push
 npx prisma generate
 ```
 
-> 💡 **Catatan Windows:**
-> Jika `EPERM` error, hentikan proses Node (`taskkill /F /IM node.exe`), hapus file `.tmp` di `.prisma/client`, lalu jalankan ulang `npx prisma generate`.
+> 💡 **Tips Windows:** jika `npx prisma generate` error `EPERM`, hentikan semua proses Node dan hapus `.tmp` di `.prisma/client`.
 
 ---
 
-## ▶️ Jalankan Server
+## ▶️ Menjalankan Server
 
-### Backend
+**Backend:**
 
 ```bash
 cd belajarindo-backend
-npm run dev   # atau node src/index.js
+npm run dev
 ```
 
-### Frontend
+**Frontend (dari root proyek):**
 
 ```bash
 python -m http.server 5500
-# buka http://localhost:5500/login.html
+# buka http://localhost:5500
 ```
 
 ---
 
-## 🧪 Tes Cepat API
+## 🧪 Fitur Utama Frontend
 
-| Endpoint                  | Method   | Keterangan         |
-| ------------------------- | -------- | ------------------ |
-| `/api/auth/login`         | POST     | Login demo user    |
-| `/api/auth/me`            | GET      | Ambil info user    |
-| `/api/quiz/submit`        | POST     | Kirim hasil kuis   |
-| `/api/quiz/history`       | GET      | Lihat riwayat kuis |
-| `/api/flashcard/progress` | GET/POST | Progres kosakata   |
+### 🎴 Vocabulary (Flashcard Mode)
 
-**Contoh login (curl):**
+* Klik **“Try Now”** → tampilkan flashcard dengan audio pelafalan.
+* Kategori: 🍽️ Food & Drinks, 👨‍👩‍👧‍👦 Family, 🏠 Daily Activities.
+* Navigasi: Next / Previous / Exit.
+* Teks dan audio bilingual: Bahasa Indonesia & Inggris.
 
-```bash
-curl -X POST http://localhost:3000/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"email":"demo@local","password":"123456"}'
-```
+### 🧩 Quiz Interaktif
+
+* Klik **“Try Now”** di fitur Quiz untuk mulai tantangan.
+* Skor otomatis disimpan ke backend (`/api/quiz/submit`).
+* Riwayat bisa dilihat di **“View History”**.
+
+### 💬 Motivational Quotes
+
+Tombol “New Motivation” menampilkan kutipan acak:
+
+> “Learning a language is like opening a door to a new world.”
+
+### 👤 Profile & Authentication
+
+* Autentikasi berbasis **JWT** dan disimpan di `localStorage`.
+* Jika belum login, user otomatis diarahkan ke `login.html`.
+* Setelah login, tombol “Profile” muncul di navbar.
 
 ---
 
 ## 🧰 Troubleshooting
 
-| Masalah                         | Solusi Cepat                                  |
-| ------------------------------- | --------------------------------------------- |
-| ❌ `PrismaClientValidationError` | Cek payload vs schema                         |
-| 🍪 Token/cookie tidak terbaca   | Pastikan `credentials: 'include'` di frontend |
-| 🪟 EPERM error di Windows       | Lihat catatan di atas                         |
+| Masalah                         | Solusi                                                           |
+| ------------------------------- | ---------------------------------------------------------------- |
+| ❌ `PrismaClientValidationError` | Periksa field dan schema Prisma                                  |
+| 🍪 Cookie tidak terbaca         | Pastikan `credentials: 'include'` di fetch frontend              |
+| 🪟 EPERM di Windows             | Stop proses node, hapus `.tmp`, jalankan ulang `prisma generate` |
 
 ---
 
-## 📂 Skrip Utilitas
+## ✨ Credits
 
-📜 `scripts/check-demo-user.js` — cek demo user
-📜 `scripts/check-quiz-vocab.js` — tampilkan quiz & vocab progress
+Dibuat dengan ❤️ oleh **[Laras Hati Mahendra](https://github.com/larashtm)**
 
----
-
-## 🧭 Catatan Pengembangan
-
-* 🧱 Gunakan `migrate dev` untuk development penuh
-* ⚡ Gunakan `db push` untuk update cepat ke DB tanpa migrasi file
+> “Belajar bahasa bukan sekadar kata — tapi memahami dunia di baliknya.”
 
 ---
 
-## 💬 Tentang Proyek
-
-BelajarIndo membantu pembelajar bahasa Indonesia dengan pengalaman interaktif —
-flashcard kosakata 🎴, kuis cepat 🧩, dan audio pronunciation 🔊.
-
----
-
-👩‍💻 **Dibuat oleh [Laras Hati Mahendra](https://github.com/larashtm)**
-⭐ *Jika proyek ini membantu, jangan lupa beri star di repo!* 🌟
-
----
-
-```
-
----
-
-Apakah kamu mau aku tambahkan juga **section "Deployment (Docker Compose)"** + badge “Build passing / Deployed on Render / Railway” biar README-nya kelihatan seperti proyek production-ready?
-```
+⭐ **Bantu proyek ini tumbuh** dengan memberi star di repo GitHub!
