@@ -20,7 +20,25 @@ app.use(cookieParser());
 // Override FRONTEND_ORIGIN in .env if needed (example: http://localhost:5500)
 const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN || 'http://localhost:5500';
 const allowedOrigins = [FRONTEND_ORIGIN, 'http://127.0.0.1:5500'];
-app.use(cors());
+
+// Configure CORS to return a specific Access-Control-Allow-Origin when credentials are used.
+// Note: browsers will reject responses that set Access-Control-Allow-Origin: '*' when request uses credentials.
+const corsOptions = {
+  origin: function (origin, callback) {
+    // allow requests with no origin (eg. mobile apps, curl)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
+// Ensure preflight requests receive the same CORS headers
+app.options('*', cors(corsOptions));
 
 // Serve static uploads (before routes so frontend can fetch files)
 app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
