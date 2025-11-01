@@ -2,6 +2,11 @@ module.exports = async (req, res) => {
   // Defensive runtime require and environment checks so the serverless
   // function returns a helpful JSON error instead of crashing silently.
   try {
+    // Quick GET check so we can verify the serverless function is deployed
+    // and returning JSON during debugging without touching DB.
+    if (req.method === 'GET') {
+      return res.status(200).json({ ok: true, message: 'register function is deployed (GET check)' });
+    }
     const bcrypt = require('bcryptjs');
     const jwt = require('jsonwebtoken');
 
