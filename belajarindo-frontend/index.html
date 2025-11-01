@@ -661,6 +661,51 @@ function nextFlashcard() {
   }
 }
 
+// Try to resend any pending quiz submissions saved locally (best-effort)
+async function resendPendingQuizSubmits() {
+  try {
+    const key = 'pendingQuizSubmits';
+    const raw = localStorage.getItem(key);
+    if (!raw) return;
+    let pending = JSON.parse(raw || '[]');
+    if (!Array.isArray(pending) || pending.length === 0) return;
+    console.log('Resending pending quiz submissions', pending.length);
+    const token = localStorage.getItem('token');
+    const headersBase = { 'Content-Type': 'application/json' };
+    if (token) headersBase['Authorization'] = 'Bearer ' + token;
+    const succeeded = [];
+    for (let i = 0; i < pending.length; i++) {
+      const item = pending[i];
+      try {
+        const res = await fetch(`${API_URL}/api/quiz/submit`, { method: 'POST', headers: headersBase, credentials: 'include', body: JSON.stringify(item) });
+        if (res && res.ok) {
+          succeeded.push(i);
+          try { showToast('Previously saved quiz result uploaded successfully.'); } catch(e){}
+        } else {
+          console.warn('Resend failed for pending item', i, res && res.status);
+        }
+      } catch (e) {
+        console.warn('Network error while resending pending quiz item', e);
+      }
+    }
+    // Remove succeeded entries (filter by index)
+    if (succeeded.length > 0) {
+      pending = pending.filter((_, idx) => !succeeded.includes(idx));
+      if (pending.length > 0) localStorage.setItem(key, JSON.stringify(pending)); else localStorage.removeItem(key);
+    }
+  } catch (e) {
+    console.warn('Failed to resend pending quiz submits', e);
+  }
+}
+
+// Auto-attempt resend when the browser goes online
+window.addEventListener('online', function() {
+  try { resendPendingQuizSubmits(); } catch(e) { console.warn('online handler failed', e); }
+});
+
+// Try immediately on load (non-blocking)
+try { resendPendingQuizSubmits(); } catch(e) { /* ignore */ }
+
 function previousFlashcard() {
   if (currentFlashcardIndex > 0) {
     currentFlashcardIndex--;
@@ -823,6 +868,33 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
       </div>
     </div>
+
+          <!-- Quiz Result Modal -->
+          <div class="modal fade" id="quizResultModal" tabindex="-1" aria-labelledby="quizResultModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="quizResultModalLabel">Quiz Result</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                  <div style="font-size:48px;font-weight:700" id="quizResultScore">0%</div>
+                  <div class="muted small mt-2" id="quizResultDetails">0 / 0 correct</div>
+                  <div class="muted small mt-1" id="quizResultTime">Time: 0s</div>
+                  <div class="mt-3" id="quizResultMessage"></div>
+                </div>
+                <div class="modal-footer d-flex justify-content-between">
+                  <div>
+                    <button type="button" class="btn btn-outline-secondary" id="quizResultViewHistory">View History</button>
+                  </div>
+                  <div>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="quizResultRestart">Restart Quiz</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
     
     <script>
     // Wait for DOM to be fully loaded
@@ -1069,76 +1141,6 @@ document.addEventListener('DOMContentLoaded', function() {
           }
         }
     
-        function loadQuizQuestion() {
-            if (!quizData[currentQuizQuestion]) return;
-            
-            const question = quizData[currentQuizQuestion];
-            document.getElementById('quiz-question').textContent = question.question;
-            
-            const options = document.querySelectorAll('.quiz-option');
-            options.forEach((option, index) => {
-                option.textContent = question.options[index];
-                option.className = 'btn btn-outline-primary quiz-option';
-                option.onclick = function() { selectAnswer(index); };
-            });
-            
-            document.getElementById('quiz-result').style.display = 'none';
-            document.getElementById('next-quiz-btn').style.display = 'none';
-            document.getElementById('restart-quiz-btn').style.display = 'none';
-            selectedAnswer = -1;
-        }
-        
-        function selectAnswer(answerIndex) {
-            selectedAnswer = answerIndex;
-            const options = document.querySelectorAll('.quiz-option');
-            const correct = quizData[currentQuizQuestion].correct;
-            
-            options.forEach((option, index) => {
-                option.classList.remove('btn-outline-primary', 'btn-success', 'btn-danger');
-                if (index === correct) {
-                    option.classList.add('btn-success');
-                } else if (index === answerIndex && answerIndex !== correct) {
-                    option.classList.add('btn-danger');
-                } else {
-                    option.classList.add('btn-outline-secondary');
-                }
-            });
-            
-            const resultDiv = document.getElementById('quiz-result');
-            const resultText = document.getElementById('result-text');
-            
-            if (answerIndex === correct) {
-                quizScore++;
-                resultText.textContent = "Correct! 🎉";
-                resultText.className = "fw-bold text-success";
-            } else {
-                resultText.textContent = "Wrong! 😞 The correct answer is: " + quizData[currentQuizQuestion].options[correct];
-                resultText.className = "fw-bold text-danger";
-            }
-            
-            document.getElementById('quiz-score').textContent = quizScore;
-            document.getElementById('total-questions').textContent = quizData.length;
-            resultDiv.style.display = 'block';
-            
-      if (currentQuizQuestion < quizData.length - 1) {
-        document.getElementById('next-quiz-btn').style.display = 'inline-block';
-      } else {
-        document.getElementById('restart-quiz-btn').style.display = 'inline-block';
-        // also show the visible submit button
-        const visibleSubmit = document.getElementById('submitQuiz');
-        if (visibleSubmit) visibleSubmit.style.display = 'inline-block';
-        // Quiz finished — submit the result to backend
-        try {
-          const totalQuestions = quizData.length;
-          const correctAnswers = quizScore;
-          const scorePercent = Math.round((quizScore / totalQuestions) * 100);
-          const timeSpentSeconds = quizStartTime ? Math.round((Date.now() - quizStartTime) / 1000) : 0;
-          submitQuizResult({ quizType: 'vocab', score: scorePercent, totalQuestions, correctAnswers, timeSpent: timeSpentSeconds });
-        } catch (err) {
-          console.error('Failed to auto-submit quiz result:', err);
-        }
-      }
-        }
         
         // Set up event listeners
         const quizDropdownLink = document.getElementById('quiz-dropdown-link');
@@ -1194,8 +1196,8 @@ document.addEventListener('DOMContentLoaded', function() {
         // try to persist final progress before submit
         try { if (window.saveQuizProgress) await window.saveQuizProgress({ quizCategory: 'vocab', currentQuestion: currentQuizQuestion }); } catch(e){ console.warn('saveQuizProgress before submit failed', e); }
         await submitQuizResult({ quizType: 'vocab', score: scorePercent, totalQuestions, correctAnswers, timeSpent: timeSpentSeconds });
-
-        restartQuiz();
+        // Do not auto-restart here. The quiz result modal will be shown by submitQuizResult
+        // and the user can choose to restart from the modal's Restart button.
       });
     }
 
@@ -1216,6 +1218,40 @@ document.addEventListener('DOMContentLoaded', function() {
         }
       });
     }
+
+    // Quiz Result modal buttons (Restart, View History) wiring
+    try {
+      const qrRestart = document.getElementById('quizResultRestart');
+      if (qrRestart) {
+        qrRestart.addEventListener('click', function() {
+          try {
+            restartQuiz();
+            const modalEl = document.getElementById('quizResultModal');
+            const inst = bootstrap.Modal.getInstance(modalEl) || null;
+            if (inst) inst.hide();
+          } catch(e) { console.warn('Failed to restart quiz from result modal', e); }
+        });
+      }
+
+      const qrViewHistory = document.getElementById('quizResultViewHistory');
+      if (qrViewHistory) {
+        qrViewHistory.addEventListener('click', async function() {
+          try {
+            const token = localStorage.getItem('token');
+            const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
+            const res = await fetch(`${API_URL}/api/quiz/history`, { credentials: 'include', headers });
+            if (!res.ok) throw new Error('Failed to fetch history');
+            const json = await res.json();
+            renderHistory(json.results || []);
+            const hm = new bootstrap.Modal(document.getElementById('historyModal'));
+            hm.show();
+          } catch (err) {
+            console.error('Failed to load history', err);
+            alert('Failed to load history. Make sure you are logged in.');
+          }
+        });
+      }
+    } catch(e) { console.warn('quiz result modal wiring failed', e); }
         
         console.log('Quiz setup complete');
     });
@@ -1273,13 +1309,85 @@ document.addEventListener('DOMContentLoaded', function() {
             console.warn('Failed to fetch history after submit', histRes.status);
           }
         } catch(e) { console.warn('Error fetching history after submit', e); }
+
+        // Populate and show the Quiz Result Modal so the user sees their result
+        try {
+          const result = (data && data.result) ? data.result : payload || {};
+          const scorePercent = (typeof result.score !== 'undefined') ? result.score : (payload && payload.score) || 0;
+          const totalQuestions = result.totalQuestions || payload.totalQuestions || 0;
+          const correctAnswers = result.correctAnswers || payload.correctAnswers || 0;
+          const timeSpent = result.timeSpent || payload.timeSpent || 0;
+
+          const elScore = document.getElementById('quizResultScore');
+          const elDetails = document.getElementById('quizResultDetails');
+          const elTime = document.getElementById('quizResultTime');
+          const elMsg = document.getElementById('quizResultMessage');
+
+          if (elScore) elScore.textContent = (scorePercent || 0) + '%';
+          if (elDetails) elDetails.textContent = `${correctAnswers} / ${totalQuestions} correct`;
+          if (elTime) elTime.textContent = `Time: ${timeSpent}s`;
+          if (elMsg) {
+            let msg = '';
+            if (scorePercent >= 85) msg = 'Excellent work!';
+            else if (scorePercent >= 60) msg = 'Good job — keep practicing!';
+            else msg = 'Keep trying — you can improve with practice.';
+            elMsg.textContent = msg;
+          }
+
+          const modalEl = document.getElementById('quizResultModal');
+          if (modalEl) {
+            const qm = new bootstrap.Modal(modalEl);
+            qm.show();
+          }
+        } catch (e) {
+          console.warn('Failed to populate/show quiz result modal', e);
+        }
       } else {
         console.error('Server error saving quiz', data);
         showToast('Failed to save quiz: ' + (data.error || 'Server error'));
       }
     } catch (err) {
       console.error('Network or other error submitting quiz', err);
-      alert('Failed to submit quiz result. Check console for details.');
+      // Fallback: save the payload locally so the user still sees results and we can retry later
+      try {
+        // store pending submissions array in localStorage
+        const key = 'pendingQuizSubmits';
+        const existing = JSON.parse(localStorage.getItem(key) || '[]');
+        // include a timestamp so we can show/inspect later
+        const toSave = Object.assign({}, payload, { _savedAt: Date.now() });
+        existing.push(toSave);
+        localStorage.setItem(key, JSON.stringify(existing));
+        showToast('You appear offline — quiz result saved locally and will be retried automatically.');
+
+        // Show the quiz result modal with the local payload so the user still sees their score
+        try {
+          const result = payload || {};
+          const scorePercent = (typeof result.score !== 'undefined') ? result.score : 0;
+          const totalQuestions = result.totalQuestions || 0;
+          const correctAnswers = result.correctAnswers || 0;
+          const timeSpent = result.timeSpent || 0;
+
+          const elScore = document.getElementById('quizResultScore');
+          const elDetails = document.getElementById('quizResultDetails');
+          const elTime = document.getElementById('quizResultTime');
+          const elMsg = document.getElementById('quizResultMessage');
+
+          if (elScore) elScore.textContent = (scorePercent || 0) + '%';
+          if (elDetails) elDetails.textContent = `${correctAnswers} / ${totalQuestions} correct`;
+          if (elTime) elTime.textContent = `Time: ${timeSpent}s`;
+          if (elMsg) elMsg.textContent = 'Saved locally — will retry when online.';
+
+          const modalEl = document.getElementById('quizResultModal');
+          if (modalEl) {
+            const qm = new bootstrap.Modal(modalEl);
+            qm.show();
+          }
+        } catch (e) { console.warn('Failed to populate local quiz result modal', e); }
+      } catch (e) {
+        console.error('Failed to save pending quiz result locally', e);
+        // As a last resort, show the old alert so user is not left without feedback
+        alert('Failed to submit quiz result. Check console for details.');
+      }
     }
   }
 
