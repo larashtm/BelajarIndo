@@ -52,7 +52,7 @@
     <div class="container">
       <div class="d-flex align-items-center gap-4 mb-4 hero-visual">
         <div class="profile-container">
-          <img id="profilePic" src="./assets/images/profile.jpg" alt="profile" class="profile-pic"
+          <img id="profilePic" src="./assets/images/profil.jpg" alt="profile" class="profile-pic"
                onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name=User&background=667eea&color=fff';">
         </div>
 
@@ -119,11 +119,8 @@
       // Profile page does not perform any server-side session checks.
       // We now rely on the backend DB for profile and history.
       // Immediately attempt to load session and data from server (requires token).
-      (function(){
-        document.getElementById('authLoader').style.display = 'none';
-        loadProfile();
-        loadHistory();
-      })();
+      initProfilePage();
+
       let chart = null;
       let allQuizData = [];
 
@@ -132,28 +129,56 @@
 
       async function loadProfile(){
         try{
+          // If we have a cached user in localStorage, show it immediately
+          try {
+            const cached = localStorage.getItem('user');
+            if (cached) {
+              const cu = JSON.parse(cached);
+              document.getElementById('profileName').textContent = cu.name || cu.email || 'User';
+              document.getElementById('profileEmail').textContent = cu.email || '';
+              document.getElementById('profileId').textContent = 'User ID: ' + (cu.id || cu.userId || 'N/A');
+            }
+          } catch (err) {
+            console.warn('failed to parse cached user', err);
+          }
+
+          // If we have a token, verify with server to refresh authoritative data
           const token = localStorage.getItem('token');
           if(!token) {
-            // show login prompt if no token
+            // no token: keep cached user visible (if any), but show login prompt for actions
             document.getElementById('loginPrompt').style.display = '';
-            document.getElementById('profileName').textContent = 'Not signed in';
             return;
           }
+
           const headers = { 'Authorization': 'Bearer ' + token };
           const r = await fetch(window.API_URL + `/api/auth/me`, { credentials: 'include', headers });
+
+          console.log("PROFILE RESPONSE STATUS:", r.status);
           if (!r.ok) {
+            console.warn("Auth failed, response:", r);
+            // token invalid: clear stored token and show login prompt
+            try { localStorage.removeItem('token'); } catch(e){}
             document.getElementById('loginPrompt').style.display = '';
             document.getElementById('profileName').textContent = 'Not signed in';
             return;
           }
           const json = await r.json();
+          console.log("PROFILE JSON:", json);
+
           const cu = json.user || json;
+
+          // persist a simple local cache for instant display next time
+          try { localStorage.setItem('user', JSON.stringify({ name: cu.name, email: cu.email, id: cu.id || cu.userId })); } catch(e){}
+
           document.getElementById('profileName').textContent = cu.name || cu.email || 'User';
           document.getElementById('profileEmail').textContent = cu.email || '';
           document.getElementById('profileId').textContent = 'User ID: ' + (cu.id || cu.userId || 'N/A');
         }catch(e){ 
           console.error('profile load',e); 
-          document.getElementById('profileName').textContent='Error loading'; 
+          // don't replace cached UI if present, but indicate error if nothing shown
+          const nameEl = document.getElementById('profileName');
+          if(!nameEl || !nameEl.textContent || nameEl.textContent.trim()==='')
+            document.getElementById('profileName').textContent='Error loading'; 
         }
       }
 
@@ -232,6 +257,21 @@
           renderSummary([]);
           renderInsights([]);
         }
+      }
+
+      async function initProfilePage(force = false) {
+        const loader = document.getElementById('authLoader');
+        // show loader only briefly while we populate the immediate UI
+        loader.style.display = '';
+
+        // loadProfile will render cached user immediately (if available)
+        await loadProfile();
+
+        // hide global loader after profile is shown so user doesn't see a full-page spinner
+        loader.style.display = 'none';
+
+        // load history in background (will show its own messages inside historyList)
+        loadHistory();
       }
 
       window.toggleDetails = function(id){
@@ -351,8 +391,7 @@
   // Clean profile script: selection UI removed.
       document.getElementById('refreshBtn').addEventListener('click', async()=>{ 
         // force server verification on explicit refresh
-        await loadProfile({force:true}); 
-        await loadHistory(); 
+        await initProfilePage(true); 
       });
       document.getElementById('logoutBtnHeader').addEventListener('click', async()=>{ 
         try{ localStorage.removeItem('user'); localStorage.removeItem('token'); }catch(e){}
