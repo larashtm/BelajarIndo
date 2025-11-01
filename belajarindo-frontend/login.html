@@ -8,13 +8,21 @@
     <link rel="icon" type="image/png" sizes="32x32" href="assets/icon/bi.png">
     <link rel="apple-touch-icon" sizes="180x180" href="assets/icon/bi.png">
     <link rel="stylesheet" href="login_simple.css">
-    <script src="login.js"></script>
+        <!-- Set production backend URL here (replace if different). This must run BEFORE login.js -->
+        <script>
+            // Backend deploy URL
+            window.API_URL = window.API_URL || "https://belajar-indo.vercel.app";
+            console.log('API_URL =', window.API_URL);
+        </script>
+        <script src="login.js"></script>
 </head>
 <body>
     <div class="main-container">
         <div class="container">
             <h1>BelajarIndo</h1>
             <p>Learn Indonesian language easily</p>
+            <!-- server message (shows server readiness / error messages) -->
+            <div id="serverMessage" style="color:#b71c1c;margin:8px 0;font-size:0.95rem"></div>
             
             <div class="tabs">
                 <button class="tab active" onclick="showLogin()">Sign In</button>

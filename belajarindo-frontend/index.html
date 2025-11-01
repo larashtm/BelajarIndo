@@ -20,7 +20,11 @@
   <!-- LINE 13: Ganti judul website -->
   <title>Indonesian Virtual Lab - Belajar Indo</title>
     <script>
-      const API_URL = "https://belajar-indo.vercel.app";
+      // Use a global window.API_URL so all pages/scripts share the same backend URL.
+      // This will not override an existing value (useful for testing or env overrides).
+      window.API_URL = window.API_URL || "https://belajar-indo.vercel.app";
+      // Backwards-compatible local const for code that still references API_URL
+      const API_URL = window.API_URL;
       // Redirect to login page if user not authenticated.
       // This runs early to avoid rendering the full index for anonymous users.
       (function(){
@@ -1444,8 +1448,11 @@ document.addEventListener('DOMContentLoaded', function() {
       window.quizStartTime = window.quizStartTime || Date.now();
     </script>
     <script>
-  if (typeof window.API_URL === 'undefined') window.API_URL = "http://localhost:3000"; 
-</script>
+      // Development-only fallback: do not override production deployments
+      if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
+        window.API_URL = window.API_URL || "http://localhost:3000";
+      }
+    </script>
     <script src="quiz.js" defer></script>
     <script>
       // Show profile only when `localStorage.user` contains a parseable user object.
