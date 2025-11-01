@@ -278,14 +278,45 @@
                 <button id="submitQuiz" class="btn btn-primary" style="display:none; margin-top:8px;">Submit Quiz</button>
                 </div>
             </div>
-            </div>
-            </div>
-            </div>
-        </div>
-        </section>
+      </div>
+      </div>
+      </div>
+      </div>
+      </section>
 
-<!-- Script untuk Vocabulary dan Flashcard -->
-<script>
+    <!-- Styles for flashcards (local to this page) -->
+    <style>
+      /* Purple stacked flashcard layout: top = Indonesian, bottom = English */
+      .single-flashcard-container{cursor:default}
+      .flashcard-stack{width:100%;border-radius:12px;overflow:hidden;box-shadow:0 12px 30px rgba(118,75,162,0.16)}
+      .flash-top,.flash-bottom{padding:28px;display:flex;align-items:center;justify-content:center;flex-direction:column;min-height:160px}
+      .flash-top{background:linear-gradient(180deg,#6b46c1 0%,#7c3aed 100%);color:#fff}
+      .flash-bottom{background:linear-gradient(180deg,#9f7aea 0%,#c4b5fd 100%);color:#1f2937}
+      .flash-top h2,.flash-bottom h2{font-size:36px;margin:0;font-weight:800}
+      .flash-top p,.flash-bottom p{margin-top:10px;opacity:0.95}
+      .audio-btn-flashcard{
+        position:absolute;
+        left:16px;
+        top:16px;
+        background:rgba(255,255,255,0.95);
+        border:none;
+        border-radius:10px;
+        width:44px;height:44px;
+        display:flex;align-items:center;justify-content:center;
+        font-size:18px;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,0.08);
+        z-index:6;
+      }
+      /* Top variant (keeps absolute inside top panel) */
+      .audio-btn-flashcard.top{position:absolute;left:16px;top:16px}
+      /* Bottom variant should be inline inside the bottom panel and aligned left above the English word */
+      .audio-btn-flashcard.bottom{position:relative;left:auto;right:auto;top:auto;bottom:auto;background:rgba(255,255,255,0.95);margin-left:12px;margin-bottom:8px;align-self:flex-start;width:40px;height:40px}
+      .single-flashcard-wrapper{position:relative}
+      .progress{background:#eee}
+      @media(max-width:768px){.flash-top,.flash-bottom{padding:18px}.flash-top h2,.flash-bottom h2{font-size:28px}}
+    </style>
+
+    <!-- Script untuk Vocabulary dan Flashcard -->
+    <script>
 // Data flashcard vocabulary
 const flashcardData = [
     { word: "Rumah", meaning: "House" },
@@ -430,55 +461,55 @@ function playEnglishAudio(event) {
 <script>
 const kosakataData = {
   makanan: [
-    { word: "Nasi", meaning: "Rice", example: "Saya makan nasi setiap hari." },
-    { word: "Air", meaning: "Water", example: "Minum air putih sehat." },
-    { word: "Makan", meaning: "Eat", example: "Kita makan bersama." },
-    { word: "Minum", meaning: "Drink", example: "Saya minum teh panas." },
-    { word: "Roti", meaning: "Bread", example: "Roti untuk sarapan." },
-    { word: "Buah", meaning: "Fruit", example: "Buah-buahan segar untuk kesehatan." },
-    { word: "Sayur", meaning: "Vegetable", example: "Makan sayur setiap hari." },
-    { word: "Daging", meaning: "Meat", example: "Daging sapi untuk BBQ." },
-    { word: "Ikan", meaning: "Fish", example: "Ikan bakar sangat lezat." },
-    { word: "Telur", meaning: "Egg", example: "Telur dadar untuk sarapan." },
-    { word: "Susu", meaning: "Milk", example: "Minum susu sebelum tidur." },
-    { word: "Keju", meaning: "Cheese", example: "Keju untuk roti bakar." },
-    { word: "Gula", meaning: "Sugar", example: "Tambahkan gula sedikit." },
-    { word: "Garam", meaning: "Salt", example: "Garam untuk bumbu masakan." },
-    { word: "Kopi", meaning: "Coffee", example: "Kopi pagi untuk semangat." }
+    { word: "Nasi", meaning: "Rice", example: "I eat rice every day.", example_id: "Saya makan nasi setiap hari." },
+    { word: "Air", meaning: "Water", example: "Drinking water is healthy.", example_id: "Saya minum air putih setiap hari." },
+    { word: "Makan", meaning: "Eat", example: "We eat together.", example_id: "Kita makan bersama." },
+    { word: "Minum", meaning: "Drink", example: "I drink hot tea.", example_id: "Saya minum teh panas." },
+    { word: "Roti", meaning: "Bread", example: "I have bread for breakfast.", example_id: "Saya sarapan roti setiap pagi." },
+    { word: "Buah", meaning: "Fruit", example: "Fresh fruit is good for your health.", example_id: "Buah-buahan segar baik untuk kesehatan." },
+    { word: "Sayur", meaning: "Vegetable", example: "Eat vegetables every day.", example_id: "Makan sayur setiap hari itu sehat." },
+    { word: "Daging", meaning: "Meat", example: "Beef is used for the BBQ.", example_id: "Daging sapi sering digunakan untuk BBQ." },
+    { word: "Ikan", meaning: "Fish", example: "Grilled fish is very tasty.", example_id: "Ikan bakar sangat lezat." },
+    { word: "Telur", meaning: "Egg", example: "I make an omelet for breakfast.", example_id: "Saya membuat telur dadar untuk sarapan." },
+    { word: "Susu", meaning: "Milk", example: "I drink milk before bed.", example_id: "Saya minum susu sebelum tidur." },
+    { word: "Keju", meaning: "Cheese", example: "Cheese goes well on toast.", example_id: "Keju enak dipadukan dengan roti bakar." },
+    { word: "Gula", meaning: "Sugar", example: "Add a little sugar.", example_id: "Tambahkan sedikit gula." },
+    { word: "Garam", meaning: "Salt", example: "Salt is used to season food.", example_id: "Garam dipakai untuk memberi rasa pada masakan." },
+    { word: "Kopi", meaning: "Coffee", example: "Morning coffee gives me energy.", example_id: "Kopi pagi memberi saya semangat." }
   ],
   keluarga: [
-    { word: "Ayah", meaning: "Father", example: "Ayah pergi bekerja." },
-    { word: "Ibu", meaning: "Mother", example: "Ibu memasak di dapur." },
-    { word: "Kakak", meaning: "Older sibling", example: "Kakak sedang belajar." },
-    { word: "Adik", meaning: "Younger sibling", example: "Adik bermain di taman." },
-    { word: "Nenek", meaning: "Grandmother", example: "Nenek bercerita dongeng." },
-    { word: "Kakek", meaning: "Grandfather", example: "Kakek membaca koran." },
-    { word: "Paman", meaning: "Uncle", example: "Paman datang berkunjung." },
-    { word: "Bibi", meaning: "Aunt", example: "Bibi membawa oleh-oleh." },
-    { word: "Sepupu", meaning: "Cousin", example: "Sepupu bermain bersama." },
-    { word: "Keponakan", meaning: "Nephew/Niece", example: "Keponakan sangat lucu." },
-    { word: "Suami", meaning: "Husband", example: "Suami berangkat kerja." },
-    { word: "Istri", meaning: "Wife", example: "Istri memasak makan malam." },
-    { word: "Anak", meaning: "Child", example: "Anak bermain di halaman." },
-    { word: "Cucu", meaning: "Grandchild", example: "Cucu mengunjungi nenek." },
-    { word: "Keluarga", meaning: "Family", example: "Keluarga berkumpul di rumah." }
+    { word: "Ayah", meaning: "Father", example: "Father goes to work." },
+    { word: "Ibu", meaning: "Mother", example: "Mother cooks in the kitchen." },
+    { word: "Kakak", meaning: "Older sibling", example: "My older sibling is studying." },
+    { word: "Adik", meaning: "Younger sibling", example: "My younger sibling is playing in the park." },
+    { word: "Nenek", meaning: "Grandmother", example: "Grandmother tells stories." },
+    { word: "Kakek", meaning: "Grandfather", example: "Grandfather reads the newspaper." },
+    { word: "Paman", meaning: "Uncle", example: "Uncle came to visit." },
+    { word: "Bibi", meaning: "Aunt", example: "Aunt brought some gifts." },
+    { word: "Sepupu", meaning: "Cousin", example: "My cousin plays with us." },
+    { word: "Keponakan", meaning: "Nephew/Niece", example: "My niece/nephew is very cute." },
+    { word: "Suami", meaning: "Husband", example: "The husband left for work." },
+    { word: "Istri", meaning: "Wife", example: "The wife cooks dinner." },
+    { word: "Anak", meaning: "Child", example: "The child plays in the yard." },
+    { word: "Cucu", meaning: "Grandchild", example: "The grandchild visits grandmother." },
+    { word: "Keluarga", meaning: "Family", example: "The family gathers at home." }
   ],
   sehari: [
-    { word: "Belajar", meaning: "Study", example: "Saya belajar bahasa Indonesia." },
-    { word: "Tidur", meaning: "Sleep", example: "Tidur cukup penting." },
-    { word: "Bangun", meaning: "Wake up", example: "Bangun pagi sehat." },
-    { word: "Mandi", meaning: "Bath", example: "Mandi sebelum berangkat." },
-    { word: "Kerja", meaning: "Work", example: "Ayah pergi kerja." },
-    { word: "Sarapan", meaning: "Breakfast", example: "Sarapan sebelum sekolah." },
-    { word: "Olahraga", meaning: "Exercise", example: "Olahraga di pagi hari." },
-    { word: "Membaca", meaning: "Reading", example: "Membaca buku sebelum tidur." },
-    { word: "Menulis", meaning: "Writing", example: "Menulis diary setiap hari." },
-    { word: "Bermain", meaning: "Playing", example: "Bermain dengan teman." },
-    { word: "Memasak", meaning: "Cooking", example: "Memasak makan malam." },
-    { word: "Berbelanja", meaning: "Shopping", example: "Berbelanja di pasar." },
-    { word: "Berjalan", meaning: "Walking", example: "Berjalan kaki ke sekolah." },
-    { word: "Menonton", meaning: "Watching", example: "Menonton film di bioskop." },
-    { word: "Mendengar", meaning: "Listening", example: "Mendengar musik favorit." }
+    { word: "Belajar", meaning: "Study", example: "I study the Indonesian language." },
+    { word: "Tidur", meaning: "Sleep", example: "Getting enough sleep is important." },
+    { word: "Bangun", meaning: "Wake up", example: "Waking up early is healthy." },
+    { word: "Mandi", meaning: "Bath", example: "Take a shower before leaving." },
+    { word: "Kerja", meaning: "Work", example: "Father goes to work." },
+    { word: "Sarapan", meaning: "Breakfast", example: "Have breakfast before school." },
+    { word: "Olahraga", meaning: "Exercise", example: "Exercise in the morning." },
+    { word: "Membaca", meaning: "Reading", example: "I read a book before bed." },
+    { word: "Menulis", meaning: "Writing", example: "I write in my diary every day." },
+    { word: "Bermain", meaning: "Playing", example: "Play with friends." },
+    { word: "Memasak", meaning: "Cooking", example: "Cook dinner." },
+    { word: "Berbelanja", meaning: "Shopping", example: "Go shopping at the market." },
+    { word: "Berjalan", meaning: "Walking", example: "Walk to school." },
+    { word: "Menonton", meaning: "Watching", example: "Watch a movie at the cinema." },
+    { word: "Mendengar", meaning: "Listening", example: "Listen to your favorite music." }
   ]
 };
 
@@ -515,35 +546,28 @@ function showFlashcardMode() {
         </div>
         <p class="text-muted">Card ${currentFlashcardIndex + 1} of ${kosakataData[currentCategory].length}</p>
       </div>
-      
+
       <div class="row justify-content-center">
-        <div class="col-md-6 col-lg-5">
-          <div class="single-flashcard-container" onclick="flipSingleCard()">
-            <div class="flashcard" id="singleFlashcard">
-              <div class="flashcard-front">
-                <div class="flashcard-content">
-                  <button class="audio-btn-flashcard" onclick="playIndonesianAudio(event)">
-                    🔊
-                  </button>
-                  <h2 class="text-center text-white">${kosakataData[currentCategory][currentFlashcardIndex].word}</h2>
-                  <p class="text-center text-light">Click to see the meaning</p>
-                </div>
+        <div class="col-md-8 col-lg-7">
+          <div class="single-flashcard-wrapper">
+            <div class="flashcard-stack">
+              <div class="flash-top" style="position:relative">
+                <button type="button" class="audio-btn-flashcard top" onclick="playIndonesianAudio(event)" aria-label="Play Indonesian pronunciation">🔊</button>
+                <h2>${kosakataData[currentCategory][currentFlashcardIndex].word}</h2>
+                <p class="ind-example small mb-2 text-white-50 mt-2">${kosakataData[currentCategory][currentFlashcardIndex].example_id || ''}</p>
+                <p class="small text-white-50">Indonesia</p>
               </div>
-              <div class="flashcard-back">
-                <div class="flashcard-content">
-                  <button class="audio-btn-flashcard" onclick="playEnglishAudio(event)">
-                    🔊
-                  </button>
-                  <h2 class="text-center text-white">${kosakataData[currentCategory][currentFlashcardIndex].meaning}</h2>
-                  <p class="text-center example-text text-light">${kosakataData[currentCategory][currentFlashcardIndex].example}</p>
-                  <p class="text-center text-light small">Click to go back</p>
-                </div>
+              <div class="flash-bottom">
+                <button type="button" class="audio-btn-flashcard bottom" onclick="playEnglishAudio(event)" aria-label="Play English pronunciation">🔊</button>
+                <h2>${kosakataData[currentCategory][currentFlashcardIndex].meaning}</h2>
+                <p class="example-text small mt-2">${kosakataData[currentCategory][currentFlashcardIndex].example}</p>
+                <p class="small text-muted mt-1">English</p>
               </div>
             </div>
           </div>
         </div>
       </div>
-      
+
       <div class="text-center mt-4">
         <button class="btn btn-secondary me-2" onclick="previousFlashcard()" ${currentFlashcardIndex === 0 ? 'disabled' : ''}>
           ← Previous
@@ -575,6 +599,56 @@ function flipSingleCard() {
   const flashcard = document.getElementById('singleFlashcard');
   flashcard.classList.toggle('flipped');
 }
+
+// Swipe support: swipe left to show English (back), swipe right to show Indonesian (front)
+;(function(){
+  let startX = null, startY = null, isPointerDown = false;
+
+  function onStart(x,y){ startX = x; startY = y; isPointerDown = true; }
+  function onEnd(x,y){
+    if (!isPointerDown || startX==null) return; isPointerDown = false;
+    const dx = x - startX, dy = y - startY;
+    // require mostly horizontal swipe
+    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)){
+      const container = document.querySelector('.single-flashcard-container');
+      if (!container) return;
+      const card = container.querySelector('.flashcard');
+      if (!card) return;
+      if (dx < 0) {
+        // swipe left -> show English (back)
+        card.classList.add('flipped');
+      } else {
+        // swipe right -> show Indonesian (front)
+        card.classList.remove('flipped');
+      }
+    }
+    startX = null; startY = null;
+  }
+
+  // Touch events
+  document.addEventListener('touchstart', function(e){
+    const t = e.touches && e.touches[0];
+    if (!t) return;
+    const el = e.target.closest && e.target.closest('.single-flashcard-container');
+    if (el) onStart(t.clientX, t.clientY);
+  }, {passive:true});
+
+  document.addEventListener('touchend', function(e){
+    // touchend has changedTouches empty; use changedTouches
+    const t = e.changedTouches && e.changedTouches[0];
+    if (!t) return;
+    onEnd(t.clientX, t.clientY);
+  });
+
+  // Mouse fallback for desktop: mousedown/mouseup
+  document.addEventListener('mousedown', function(e){
+    const el = e.target.closest && e.target.closest('.single-flashcard-container');
+    if (el) onStart(e.clientX, e.clientY);
+  });
+  document.addEventListener('mouseup', function(e){
+    onEnd(e.clientX, e.clientY);
+  });
+})();
 
 function nextFlashcard() {
   if (currentFlashcardIndex < kosakataData[currentCategory].length - 1) {
