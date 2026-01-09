@@ -1,154 +1,51 @@
+<div align="center">
+  <img src="https://github.com/larashtm/BelajarIndo/blob/main/docs/Belajar.png" alt="BelajarIndo Logo" width="7600/>
 
-# BelajarIndo — Indonesian Virtual Lab  
+[![Node.js](https://img.shields.io/badge/Node.js-18+-339933?style=flat-square&logo=node.js)](https://nodejs.org/) [![Express.js](https://img.shields.io/badge/Express.js-Backend-000000?style=flat-square&logo=express)](https://expressjs.com/) [![Prisma](https://img.shields.io/badge/Prisma-ORM-2D3748?style=flat-square&logo=prisma)](https://www.prisma.io/) [![Postgres](https://img.shields.io/badge/PostgreSQL-Database-4169E1?style=flat-square&logo=postgresql)](https://www.postgresql.org/) [![Bootstrap](https://img.shields.io/badge/Bootstrap-UI-7952B3?style=flat-square&logo=bootstrap)](https://getbootstrap.com/) [![Animate.css](https://img.shields.io/badge/Animate.css-Animation-F06292?style=flat-square)](https://animate.style/)
 
-> 🌸 *Learn Bahasa Indonesia interactively — with flashcards, quizzes, and motivation boosts!*  
 
-[![Node.js](https://img.shields.io/badge/Node.js-18+-green?logo=node.js)](https://nodejs.org/)  
-[![Express.js](https://img.shields.io/badge/Backend-Express.js-black?logo=express)](https://expressjs.com/)  
-[![Prisma](https://img.shields.io/badge/ORM-Prisma-blue?logo=prisma)](https://www.prisma.io/)  
-[![Postgres](https://img.shields.io/badge/Database-Postgres-blue?logo=postgresql)](https://www.postgresql.org/)  
-[![Bootstrap](https://img.shields.io/badge/UI-Bootstrap_5-purple?logo=bootstrap)](https://getbootstrap.com/)  
-[![Animate.css](https://img.shields.io/badge/Animation-Animate.css-pink)](https://animate.style/)  
+</div>
 
 ---
 
-## 🧠 Tentang  
-**BelajarIndo** adalah *virtual lab* pembelajaran Bahasa Indonesia berbasis web, dikembangkan menggunakan **Node.js + Express + Prisma + PostgreSQL** di sisi backend, serta **HTML, CSS, Bootstrap, dan JavaScript** di sisi frontend.  
+## Overview
 
-✨ **Fitur utama:**  
-- 🎴 **Vocabulary Flashcards** dengan audio pelafalan (Text-to-Speech)  
-- 🧩 **Interactive Quiz** dengan penyimpanan hasil ke backend  
-- 💬 **Motivational quotes** dinamis  
-- 👤 **User authentication** (login/register, profile)  
-- 📱 **Responsif** — dapat dibuka di laptop, tablet, maupun smartphone  
+> BelajarIndo adalah aplikasi web pembelajaran bahasa yang dirancang untuk membantu pengguna mempelajari Bahasa Indonesia secara interaktif dan menyenangkan. Aplikasi ini mengintegrasikan teknologi Text-to-Speech untuk pelafalan, sistem autentikasi pengguna, serta penyimpanan progres pembelajaran.
 
+---
+
+##  Features
+Berikut ini adalah fitur-fitur utama yang disediakan dalam aplikasi **BelajarIndo**:
+
+| Fitur | Deskripsi |
+|------|----------|
+| **Vocabulary Flashcards** | Kartu pembelajaran kosakata dengan kategori (makanan & minuman, keluarga, aktivitas harian) dilengkapi audio pelafalan bilingual. |
+| **Interactive Quiz** | Kuis interaktif dengan sistem penilaian otomatis dan penyimpanan hasil ke database. |
+| **User Authentication** | Sistem login dan registrasi berbasis JWT dengan manajemen profil pengguna. |
+| **Responsive Design** | Antarmuka yang dapat diakses dengan optimal di berbagai perangkat (desktop, tablet, smartphone). |
+| **Motivational Quotes** | Kutipan motivasi dinamis untuk meningkatkan semangat belajar. |
+
+
+---
+## Project Structure
+Dibawah ini adalah struktur folder utama yang digunakan dalam pengembangan aplikasi BelajarIndo beserta fungsi dari masing-masing direktori:
+```
+BelajarIndo/
+├── belajarindo-backend/        # Backend Express.js
+│   ├── api/                    # Endpoint API
+│   ├── prisma/                 # Schema dan migrasi database
+│   ├── scripts/                # Script pendukung
+│   ├── server/                 # Konfigurasi server
+│   └── src/                    # Controllers, routes, middleware
+│
+├── belajarindo-frontend/       # Frontend aplikasi
+│   └── assets/                 # CSS, JavaScript, dan images
+│
+├── docs/                       # Dokumentasi tambahan
+├── index.html                  # Entry point frontend
+└── README.md
+```
+ Deployment
+ 
 🔗 Demo (frontend): [https://larashtm.github.io/BelajarIndo/](https://larashtm.github.io/BelajarIndo/)  
 🔗 Backend (API): [https://belajar-indo.vercel.app](https://belajar-indo.vercel.app)
-
----
-
-## 📂 Struktur Proyek  
-
-```
-
-BelajarIndo/
-├── index.html                 # Halaman utama (hero, features, motivation)
-├── login.html, profile.html   # Halaman auth dan profil
-├── assets/                    # Gambar, icon, CSS
-│   ├── images/
-│   ├── icon/
-│   └── dist/css/style.css
-├── belajarindo-backend/       # Folder backend (Express + Prisma)
-│   ├── src/
-│   ├── prisma/
-│   └── scripts/
-└── README.md
-
-````
-
----
-
-## 🧩 Prasyarat  
-
-- [Node.js](https://nodejs.org/) v18 atau lebih baru  
-- [PostgreSQL](https://www.postgresql.org/download/) (local atau remote)  
-- PowerShell / Bash  
-
----
-
-## ⚙️ Setup Backend  
-
-```bash
-cd belajarindo-backend
-cp .env.example .env   # jika belum ada, buat manual
-npm install
-````
-
-**Isi file `.env`:**
-
-```env
-DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DATABASE"
-JWT_SECRET="your_secret_here"
-NODE_ENV=development
-```
-
-Sinkronisasi Prisma:
-
-```bash
-# jika punya akses DDL
-npx prisma migrate dev --name init
-# jika akses terbatas
-npx prisma db push
-npx prisma generate
-```
-
-> 💡 **Tips Windows:** jika `npx prisma generate` error `EPERM`, hentikan semua proses Node dan hapus `.tmp` di `.prisma/client`.
-
----
-
-## ▶️ Menjalankan Server
-
-**Backend:**
-
-```bash
-cd belajarindo-backend
-npm run dev
-```
-
-**Frontend (dari root proyek):**
-
-```bash
-python -m http.server 5500
-# buka http://localhost:5500
-```
-
----
-
-## 🧪 Fitur Utama Frontend
-
-### 🎴 Vocabulary (Flashcard Mode)
-
-* Klik **“Try Now”** → tampilkan flashcard dengan audio pelafalan.
-* Kategori: 🍽️ Food & Drinks, 👨‍👩‍👧‍👦 Family, 🏠 Daily Activities.
-* Navigasi: Next / Previous / Exit.
-* Teks dan audio bilingual: Bahasa Indonesia & Inggris.
-
-### 🧩 Quiz Interaktif
-
-* Klik **“Try Now”** di fitur Quiz untuk mulai tantangan.
-* Skor otomatis disimpan ke backend (`/api/quiz/submit`).
-* Riwayat bisa dilihat di **“View History”**.
-
-### 💬 Motivational Quotes
-
-Tombol “New Motivation” menampilkan kutipan acak:
-
-> “Learning a language is like opening a door to a new world.”
-
-### 👤 Profile & Authentication
-
-* Autentikasi berbasis **JWT** dan disimpan di `localStorage`.
-* Jika belum login, user otomatis diarahkan ke `login.html`.
-* Setelah login, tombol “Profile” muncul di navbar.
-
----
-
-## 🧰 Troubleshooting
-
-| Masalah                         | Solusi                                                           |
-| ------------------------------- | ---------------------------------------------------------------- |
-| ❌ `PrismaClientValidationError` | Periksa field dan schema Prisma                                  |
-| 🍪 Cookie tidak terbaca         | Pastikan `credentials: 'include'` di fetch frontend              |
-| 🪟 EPERM di Windows             | Stop proses node, hapus `.tmp`, jalankan ulang `prisma generate` |
-
----
-
-## ✨ Credits
-
-Dibuat dengan ❤️ oleh **[Laras Hati Mahendra](https://github.com/larashtm)**
-
-> “Belajar bahasa bukan sekadar kata — tapi memahami dunia di baliknya.”
-
----
-
-⭐ **Bantu proyek ini tumbuh** dengan memberi star di repo GitHub!
